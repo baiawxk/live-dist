@@ -1,5 +1,7 @@
 import {initApp} from '@app/main';
 import {fileURLToPath} from 'node:url';
+import path from 'node:path';
+import {URL} from 'node:url';
 
 if (process.env.NODE_ENV === 'development' || process.env.PLAYWRIGHT_TEST === 'true' || !!process.env.CI) {
   function showAndExit(...args) {
@@ -26,11 +28,11 @@ initApp(
     renderer: (process.env.MODE === 'development' && !!process.env.VITE_DEV_SERVER_URL) ?
       new URL(process.env.VITE_DEV_SERVER_URL)
       : {
-        path: fileURLToPath(import.meta.resolve('@app/renderer')),
+        path: fileURLToPath(new URL('../packages/renderer/dist/index.html', import.meta.url)),
       },
 
     preload: {
-      path: fileURLToPath(import.meta.resolve('@app/preload/exposed.mjs')),
+      path: fileURLToPath(new URL('../packages/preload/dist/exposed.mjs', import.meta.url)),
     },
   },
 );

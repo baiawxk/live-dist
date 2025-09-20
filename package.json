@@ -4,27 +4,29 @@
   "version": "3.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "@app/preload": {
+      "default": "./packages/preload/dist/exposed.mjs"
+    }
+  },
   "author": {
     "email": "kozackunisoft@gmail.com",
     "name": "Alex Kozack",
     "url": "https://kozack.me"
   },
   "main": "packages/entry-point.mjs",
-  "workspaces": [
-    "packages/*"
-  ],
   "engines": {
     "node": ">=23.0.0"
   },
   "scripts": {
-    "build": "npm run build -ws --if-present",
-    "compile": "npm run build && electron-builder build --config electron-builder.mjs",
-    "test": "npx playwright test ./tests/e2e.spec.ts",
+    "build": "pnpm run build --filter=\"*\"",
+    "compile": "pnpm run build && electron-builder build --config electron-builder.mjs",
+    "test": "playwright test ./tests/e2e.spec.ts",
     "start": "node packages/dev-mode.js",
-    "typecheck": "npm run typecheck -ws --if-present",
+    "typecheck": "pnpm run typecheck --filter=\"*\"",
     "create-renderer": "cd packages && node ./integrate-renderer/create-renderer.js",
-    "integrate-renderer": "npm start --workspace @app/integrate-renderer",
-    "init": "npm run create-renderer && npm run integrate-renderer && npm install"
+    "integrate-renderer": "pnpm --filter @app/integrate-renderer start",
+    "init": "pnpm run create-renderer && pnpm run integrate-renderer && pnpm install"
   },
   "devDependencies": {
     "@npmcli/map-workspaces": "5.0.0",
@@ -37,6 +39,6 @@
     "playwright": "^1.55.0"
   },
   "dependencies": {
-    "@app/main": "*"
+    "@app/main": "workspace:*"
   }
 }
