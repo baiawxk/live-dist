@@ -4,11 +4,6 @@
   "version": "3.1.0",
   "private": true,
   "type": "module",
-  "exports": {
-    "@app/preload": {
-      "default": "./packages/preload/dist/exposed.mjs"
-    }
-  },
   "author": {
     "email": "kozackunisoft@gmail.com",
     "name": "Alex Kozack",
@@ -39,6 +34,7 @@
     "playwright": "^1.55.0"
   },
   "dependencies": {
-    "@app/main": "workspace:*"
+    "@app/main": "workspace:*",
+    "@app/preload": "workspace:*"
   }
 }
