@@ -94,6 +94,8 @@ async function getListOfFilesFromEachWorkspace() {
     pkg,
   });
 
+  console.log(workspaces);
+
   const allFilesToInclude = [];
 
   for (const [name, path] of workspaces) {
@@ -105,6 +107,8 @@ async function getListOfFilesFromEachWorkspace() {
     patterns = patterns.map(p => join('node_modules', name, p));
     allFilesToInclude.push(...patterns);
   }
+
+  console.log(allFilesToInclude);
 
   return allFilesToInclude;
 }

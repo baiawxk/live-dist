@@ -5,13 +5,16 @@
   "private": true,
   "type": "module",
   "author": {
-    "email": "kozackunisoft@gmail.com",
-    "name": "Alex Kozack",
-    "url": "https://kozack.me"
+    "email": "baiawxk@qq.com",
+    "name": "baiawxk",
+    "url": "https://github.com/baiawxk"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "main": "packages/entry-point.mjs",
   "engines": {
-    "node": ">=23.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "build": "pnpm --filter=\"*\" run build"  ,
@@ -34,7 +37,6 @@
     "playwright": "^1.55.0"
   },
   "dependencies": {
-    "@app/main": "workspace:*",
-    "@app/preload": "workspace:*"
+    "@app/main": "workspace:*"
   }
 }
