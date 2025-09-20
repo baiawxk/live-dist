@@ -20,7 +20,14 @@ export class IPCHandler {
 
     // 添加新的目录配置
     ipcMain.handle('add-dist', (_, config: Omit<DistConfig, 'id' | 'isActive'>) => {
-      return this.distManager.addDist(config)
+      try {
+        const result = this.distManager.addDist(config)
+        console.log('addDist result in main:', result)
+        return result
+      } catch (error) {
+        console.error('addDist error in main:', error)
+        throw error
+      }
     })
 
     // 更新目录配置

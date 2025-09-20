@@ -1,7 +1,9 @@
 import { spawn, ChildProcess } from 'node:child_process';
-import * as liveServer from 'live-server';
+import liveServer from 'live-server';
 import { ProxyConfig, DistConfig } from './DistManager.js';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 
 interface ServerInstance {
   port: number;
@@ -24,16 +26,36 @@ export class LiveServerManager {
         root: config.path,
         open: false, // 不自动打开浏览器
         logLevel: 2 as 0 | 1 | 2, // 0 = errors only, 1 = some, 2 = lots
-        middleware: this.createProxyMiddleware(config.proxyRules)
+        middleware: this.createProxyMiddleware(config.proxyRules),
+        // 添加额外的配置以确保正确运行
+        host: '0.0.0.0',
+        https: false,
+        wait: 100,
+        mount: [] as Array<[string, string]>, // 修复类型
+        proxy: [] as Array<[string, string]>, // 修复类型
+        cors: false,
+        file: 'index.html',
+        watch: [] as string[], // 修复类型
+        ignore: [] as string[] // 修复类型
       };
 
+      console.log('Starting server with config:', serverConfig);
+      
       // 启动服务器
-      const server = liveServer.start(serverConfig);
+      const server = new Promise((resolve, reject) => {
+        try {
+          const liveServerInstance = liveServer.start(serverConfig);
+          resolve(liveServerInstance);
+        } catch (err) {
+          reject(err);
+        }
+      });
 
+      const serverInstance = await server;
       this.servers.set(config.id, {
         port: config.port,
         distId: config.id,
-        process: server
+        process: serverInstance
       });
 
       return true;
@@ -77,12 +99,16 @@ export class LiveServerManager {
     }
 
     return proxyRules.map(rule => {
-      return createProxyMiddleware(rule.path, {
-        target: rule.target,
-        changeOrigin: rule.changeOrigin ?? true,
-        secure: rule.secure ?? false,
-        logLevel: 'silent'
-      });
+      // 使用函数形式返回中间件
+      return (req: any, res: any, next: any) => {
+        const proxy = createProxyMiddleware(rule.path, {
+          target: rule.target,
+          changeOrigin: rule.changeOrigin ?? true,
+          secure: rule.secure ?? false,
+          logLevel: 'silent'
+        });
+        return proxy(req, res, next);
+      };
     });
   }
 

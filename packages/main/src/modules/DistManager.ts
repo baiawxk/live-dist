@@ -41,17 +41,23 @@ export class DistManager {
 
   // 添加新的 dist 配置
   addDist(config: Omit<DistConfig, 'id' | 'createdAt' | 'updatedAt' | 'isActive'>): DistConfig {
-    const dists = this.getAllDists();
-    const newDist: DistConfig = {
-      ...config,
-      id: Date.now().toString(),
-      isActive: false,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
+    try {
+      const dists = this.getAllDists();
+      const newDist: DistConfig = {
+        ...config,
+        id: Date.now().toString(),
+        isActive: false,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      };
 
-    this.store.set('dists', [...dists, newDist]);
-    return newDist;
+      this.store.set('dists', [...dists, newDist]);
+      console.log('New dist added:', newDist);
+      return newDist;
+    } catch (error) {
+      console.error('Error adding dist:', error);
+      throw error;
+    }
   }
 
   // 更新 dist 配置

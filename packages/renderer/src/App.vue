@@ -78,7 +78,19 @@ const showAddDistDialog = () => {
 
 const showEditDistDialog = (dist: DistConfig) => {
   isEditing.value = true
-  form.value = { ...dist }
+  // 创建一个新的纯数据对象
+  form.value = {
+    id: dist.id,
+    name: dist.name,
+    path: dist.path,
+    port: dist.port,
+    proxyRules: dist.proxyRules.map(rule => ({
+      path: rule.path,
+      target: rule.target,
+      changeOrigin: rule.changeOrigin ?? true,
+      secure: rule.secure ?? false
+    }))
+  }
   dialogVisible.value = true
 }
 
@@ -94,12 +106,14 @@ const selectDirectory = async () => {
 }
 
 const addProxyRule = () => {
-  form.value.proxyRules.push({
+  // 创建一个新的纯数据对象作为代理规则
+  const newRule = {
     path: '',
     target: '',
     changeOrigin: true,
     secure: false
-  })
+  }
+  form.value.proxyRules = [...form.value.proxyRules, newRule]
 }
 
 const removeProxyRule = (index: number) => {
@@ -112,16 +126,34 @@ const saveDistConfig = async () => {
   await formRef.value.validate(async (valid) => {
     if (valid) {
       try {
+        // 创建一个新的纯数据对象，不包含任何方法或不可序列化的属性
+        const configData = {
+          id: form.value.id,
+          name: form.value.name,
+          path: form.value.path,
+          port: form.value.port,
+          isActive: false,  // 添加必需的 isActive 字段
+          proxyRules: form.value.proxyRules.map(rule => ({
+            path: rule.path,
+            target: rule.target,
+            changeOrigin: rule.changeOrigin ?? true,
+            secure: rule.secure ?? false
+          }))
+        };
+
         if (isEditing.value) {
-          await distMgr.updateDist(form.value)
+          console.log('updateDist', configData);
+          await distMgr.updateDist(configData)
           ElMessage.success('更新成功')
         } else {
-          await distMgr.addDist(form.value)
+          console.log('addDist', configData);
+          await distMgr.addDist(configData)
           ElMessage.success('添加成功')
         }
         dialogVisible.value = false
         await loadDistList()
       } catch (error) {
+        console.log(error);
         ElMessage.error(isEditing.value ? '更新失败' : '添加失败')
       }
     }
@@ -130,15 +162,18 @@ const saveDistConfig = async () => {
 
 const toggleServer = async (dist: DistConfig) => {
   try {
+    // 只传递必要的 id
+    const serverId = dist.id
     if (dist.isActive) {
-      await distMgr.stopServer(dist.id)
+      await distMgr.stopServer(serverId)
       ElMessage.success('服务已停止')
     } else {
-      await distMgr.startServer(dist.id)
+      await distMgr.startServer(serverId)
       ElMessage.success('服务已启动')
     }
     await loadDistList()
   } catch (error) {
+    console.error('Server toggle error:', error)
     ElMessage.error(dist.isActive ? '停止服务失败' : '启动服务失败')
   }
 }
@@ -148,6 +183,9 @@ const openInBrowser = (dist: DistConfig) => {
 }
 
 const confirmDelete = (dist: DistConfig) => {
+  const serverId = dist.id // 提前获取ID，避免后续可能的引用问题
+  const isActive = dist.isActive
+  
   ElMessageBox.confirm(
     '确定要删除这个目录吗？如果服务正在运行，会先停止服务。',
     '确认删除',
@@ -158,13 +196,14 @@ const confirmDelete = (dist: DistConfig) => {
     }
   ).then(async () => {
     try {
-      if (dist.isActive) {
-        await distMgr.stopServer(dist.id)
+      if (isActive) {
+        await distMgr.stopServer(serverId)
       }
-      await distMgr.removeDist(dist.id)
+      await distMgr.removeDist(serverId)
       ElMessage.success('删除成功')
       await loadDistList()
     } catch (error) {
+      console.error('Delete error:', error)
       ElMessage.error('删除失败')
     }
   })

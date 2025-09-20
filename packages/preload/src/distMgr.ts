@@ -23,7 +23,14 @@ export default{
   },
   // 添加新的目录配置
   addDist: async (config: Omit<DistConfig, 'id' | 'isActive'>) => {
-    return await ipcRenderer.invoke('add-dist', config)
+    try {
+      const result = await ipcRenderer.invoke('add-dist', config)
+      console.log('addDist result:', result)
+      return result
+    } catch (error) {
+      console.error('addDist error:', error)
+      throw error
+    }
   },
   // 更新目录配置
   updateDist: async (config: DistConfig) => {
