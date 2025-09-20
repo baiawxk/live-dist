@@ -50,10 +50,133 @@ const rules: FormRules = {
   ]
 }
 
+// 批量操作状态
+const batchLoading = ref<'start' | 'stop' | false>(false)
+
 // 生命周期
 onMounted(async () => {
   await loadDistList()
 })
+
+// 批量启动所有服务
+const startAllServers = async () => {
+  if (batchLoading.value) return
+  
+  try {
+    batchLoading.value = 'start'
+    const notRunningServers = distList.value.filter(dist => !dist.isActive)
+    
+    if (notRunningServers.length === 0) {
+      ElMessage.info('没有需要启动的服务')
+      return
+    }
+
+    // 创建启动进度消息
+    const progressMessage = ElMessage as any
+progressMessage({
+      type: 'info',
+      duration: 0,
+      message: `正在启动服务 (0/${notRunningServers.length})`
+    })
+
+    let successCount = 0
+    let failCount = 0
+
+    // 依次启动每个服务
+    for (const dist of notRunningServers) {
+      try {
+        await distMgr.startServer(dist.id)
+        successCount++
+        // 更新进度消息
+        if (progressMessage) {
+          const currentProgress = successCount + failCount
+          progressMessage.message = `正在启动服务 (${currentProgress}/${notRunningServers.length})`
+        }
+      } catch (error) {
+        console.error(`Failed to start server ${dist.id}:`, error)
+        failCount++
+      }
+    }
+
+    // 关闭进度消息
+    progressMessage.close()
+
+    await loadDistList() // 先更新列表
+
+    // 显示最终结果
+    if (failCount === 0) {
+      ElMessage.success(`成功启动 ${successCount} 个服务`)
+    } else {
+      ElMessage.warning(`${successCount} 个服务启动成功，${failCount} 个服务启动失败`)
+    }
+  } catch (error) {
+    console.error('Batch start error:', error)
+    ElMessage.error('批量启动服务失败')
+    await loadDistList() // 确保发生错误时也更新列表
+  } finally {
+    batchLoading.value = false
+  }
+}
+
+// 批量停止所有服务
+const stopAllServers = async () => {
+  if (batchLoading.value) return
+  
+  try {
+    batchLoading.value = 'stop'
+    const runningServers = distList.value.filter(dist => dist.isActive)
+    
+    if (runningServers.length === 0) {
+      ElMessage.info('没有需要停止的服务')
+      return
+    }
+
+    // 创建停止进度消息
+    const progressMessage = ElMessage as any
+    progressMessage({
+      type: 'info',
+      duration: 0,
+      message: `正在停止服务 (0/${runningServers.length})`
+    })
+
+    let successCount = 0
+    let failCount = 0
+
+    // 依次停止每个服务
+    for (const dist of runningServers) {
+      try {
+        await distMgr.stopServer(dist.id)
+        successCount++
+        // 更新进度消息
+        if (progressMessage) {
+          const currentProgress = successCount + failCount
+          progressMessage.message = `正在停止服务 (${currentProgress}/${runningServers.length})`
+        }
+      } catch (error) {
+        console.error(`Failed to stop server ${dist.id}:`, error)
+        failCount++
+      }
+    }
+
+    // 关闭进度消息
+    progressMessage.close()
+
+    await loadDistList() // 先更新列表
+
+    // 显示最终结果
+    if (failCount === 0) {
+      ElMessage.success(`成功停止 ${successCount} 个服务`)
+    } else {
+      ElMessage.warning(`${successCount} 个服务停止成功，${failCount} 个服务停止失败`)
+    }
+  } catch (error) {
+    console.error('Batch stop error:', error)
+    ElMessage.error('批量停止服务失败')
+    await loadDistList() // 确保发生错误时也更新列表
+  } finally {
+    batchLoading.value = false
+  }
+}
 
 // 方法
 const loadDistList = async () => {
@@ -237,7 +360,23 @@ const confirmDelete = (dist: DistConfig) => {
     <el-header>
       <div class="header-content">
         <h1>Dist Manager</h1>
-        <el-button type="primary" @click="showAddDistDialog">添加目录</el-button>
+        <div class="header-buttons">
+          <el-button 
+            type="success" 
+            @click="startAllServers" 
+            :loading="batchLoading === 'start'"
+            :disabled="distList.every(dist => dist.isActive) || distList.length === 0">
+            一键启动所有服务
+          </el-button>
+          <el-button 
+            type="warning" 
+            @click="stopAllServers" 
+            :loading="batchLoading === 'stop'"
+            :disabled="distList.every(dist => !dist.isActive) || distList.length === 0">
+            一键停止所有服务
+          </el-button>
+          <el-button type="primary" @click="showAddDistDialog">添加目录</el-button>
+        </div>
       </div>
     </el-header>
     <el-main>
