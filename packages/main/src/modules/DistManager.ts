@@ -99,7 +99,29 @@ export class DistManager {
 
   // 更新 dist 的活动状态
   updateDistStatus(id: string, isActive: boolean): boolean {
-    const updated = this.updateDist(id, { isActive });
-    return updated !== null;
+    console.log(`Updating status for ID ${id} to ${isActive}`);
+    try {
+      const dists = this.getAllDists();
+      const index = dists.findIndex(dist => dist.id === id);
+      
+      if (index === -1) {
+        console.log(`No dist found with ID ${id}`);
+        return false;
+      }
+
+      const updatedDist = {
+        ...dists[index],
+        isActive,
+        updatedAt: Date.now()
+      };
+
+      dists[index] = updatedDist;
+      this.store.set('dists', dists);
+      console.log(`Status updated successfully for ${id}`);
+      return true;
+    } catch (error) {
+      console.error(`Error updating status for ${id}:`, error);
+      return false;
+    }
   }
 }

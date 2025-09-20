@@ -160,10 +160,26 @@ const saveDistConfig = async () => {
   })
 }
 
+// 服务器操作的加载状态
+const loadingStates = ref<{ [key: string]: boolean }>({})
+
+// 初始化时清除所有加载状态
+onMounted(() => {
+  loadingStates.value = {}
+})
+
 const toggleServer = async (dist: DistConfig) => {
+  const serverId = dist.id
+  
+  // 如果已经在加载状态，直接返回
+  if (loadingStates.value[serverId]) {
+    return
+  }
+
   try {
-    // 只传递必要的 id
-    const serverId = dist.id
+    // 设置加载状态
+    loadingStates.value[serverId] = true
+    
     if (dist.isActive) {
       await distMgr.stopServer(serverId)
       ElMessage.success('服务已停止')
@@ -171,10 +187,16 @@ const toggleServer = async (dist: DistConfig) => {
       await distMgr.startServer(serverId)
       ElMessage.success('服务已启动')
     }
+
     await loadDistList()
   } catch (error) {
     console.error('Server toggle error:', error)
     ElMessage.error(dist.isActive ? '停止服务失败' : '启动服务失败')
+    // 出错时恢复之前的状态
+    await loadDistList()
+  } finally {
+    // 清除加载状态
+    loadingStates.value[serverId] = false
   }
 }
 
@@ -236,11 +258,12 @@ const confirmDelete = (dist: DistConfig) => {
               <el-button
                 :type="row.isActive ? 'danger' : 'success'"
                 @click="toggleServer(row)"
+                :loading="loadingStates[row.id]"
               >
                 {{ row.isActive ? '停止' : '启动' }}
               </el-button>
               <el-button @click="showEditDistDialog(row)">编辑</el-button>
-              <el-button @click="openInBrowser(row)" v-if="row.isActive">
+              <el-button @click="openInBrowser(row)" v-if="row.port">
                 打开
               </el-button>
               <el-button type="danger" @click="confirmDelete(row)">
