@@ -14,7 +14,7 @@
     "node": ">=23.0.0"
   },
   "scripts": {
-    "build": "pnpm run build --filter=\"*\"",
+    "build": "pnpm --filter=\"*\" run build"  ,
     "compile": "pnpm run build && electron-builder build --config electron-builder.mjs",
     "test": "playwright test ./tests/e2e.spec.ts",
     "start": "node packages/dev-mode.js",
