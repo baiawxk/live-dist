@@ -71,13 +71,6 @@ const startAllServers = async () => {
       return
     }
 
-    // 创建启动进度消息
-    const progressMessage = ElMessage as any
-progressMessage({
-      type: 'info',
-      duration: 0,
-      message: `正在启动服务 (0/${notRunningServers.length})`
-    })
 
     let successCount = 0
     let failCount = 0
@@ -87,19 +80,13 @@ progressMessage({
       try {
         await distMgr.startServer(dist.id)
         successCount++
-        // 更新进度消息
-        if (progressMessage) {
-          const currentProgress = successCount + failCount
-          progressMessage.message = `正在启动服务 (${currentProgress}/${notRunningServers.length})`
-        }
+        
       } catch (error) {
         console.error(`Failed to start server ${dist.id}:`, error)
         failCount++
       }
     }
 
-    // 关闭进度消息
-    progressMessage.close()
 
     await loadDistList() // 先更新列表
 
@@ -132,13 +119,7 @@ const stopAllServers = async () => {
     }
 
     // 创建停止进度消息
-    const progressMessage = ElMessage as any
-    progressMessage({
-      type: 'info',
-      duration: 0,
-      message: `正在停止服务 (0/${runningServers.length})`
-    })
-
+    
     let successCount = 0
     let failCount = 0
 
@@ -147,19 +128,12 @@ const stopAllServers = async () => {
       try {
         await distMgr.stopServer(dist.id)
         successCount++
-        // 更新进度消息
-        if (progressMessage) {
-          const currentProgress = successCount + failCount
-          progressMessage.message = `正在停止服务 (${currentProgress}/${runningServers.length})`
-        }
+       
       } catch (error) {
         console.error(`Failed to stop server ${dist.id}:`, error)
         failCount++
       }
     }
-
-    // 关闭进度消息
-    progressMessage.close()
 
     await loadDistList() // 先更新列表
 
