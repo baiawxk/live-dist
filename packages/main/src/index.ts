@@ -8,6 +8,7 @@ import { hardwareAccelerationMode } from './modules/HardwareAccelerationModule.j
 import { createIPCHandlerModule } from './modules/IPCHandlerModule.js'
 import { disallowMultipleAppInstance } from './modules/SingleInstanceApp.js'
 import { createWindowManagerModule } from './modules/WindowManager.js'
+import { createTrayIconModule } from './modules/TrayIconModule.js'
 
 export async function initApp(initConfig: AppInitConfig) {
   const moduleRunner = createModuleRunner()
@@ -17,6 +18,7 @@ export async function initApp(initConfig: AppInitConfig) {
     .init(hardwareAccelerationMode({ enable: false }))
     .init(autoUpdater())
     .init(createIPCHandlerModule())
+    .init(createTrayIconModule())
 
   // Install DevTools extension if needed
   // .init(chromeDevToolsExtension({extension: 'VUEJS3_DEVTOOLS'}))
