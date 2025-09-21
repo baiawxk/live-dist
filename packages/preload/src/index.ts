@@ -1,3 +1,3 @@
-import distMgr from "./distMgr.js";
+import distMgr from './distMgr.js'
 
 export { distMgr }

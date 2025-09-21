@@ -16,7 +16,7 @@ interface DistConfig {
   proxyRules: ProxyRule[]
 }
 
-export default{
+export default {
   // 获取所有目录配置
   getAllDists: async () => {
     return await ipcRenderer.invoke('get-all-dists')
@@ -27,7 +27,8 @@ export default{
       const result = await ipcRenderer.invoke('add-dist', config)
       console.log('addDist result:', result)
       return result
-    } catch (error) {
+    }
+    catch (error) {
       console.error('addDist error:', error)
       throw error
     }

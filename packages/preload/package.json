@@ -1,10 +1,6 @@
 {
   "name": "@app/preload",
   "type": "module",
-  "scripts": {
-    "build": "vite build",
-    "typecheck": "tsc --noEmit"
-  },
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -14,6 +10,10 @@
       "types": "./src/exposed.d.ts",
       "default": "./dist/exposed.mjs"
     }
+  },
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@app/electron-versions": "workspace:*",

@@ -1,11 +1,11 @@
-export type AppInitConfig = {
+export interface AppInitConfig {
   preload: {
-    path: string;
-  };
+    path: string
+  }
 
   renderer:
     | {
-        path: string;
-      }
-    | URL;
-};
+      path: string
+    }
+    | URL
+}

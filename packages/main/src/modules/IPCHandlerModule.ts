@@ -12,6 +12,6 @@ export function createIPCHandlerModule(): AppModule {
       context.app.on('before-quit', () => {
         ipcHandler?.cleanup()
       })
-    }
+    },
   }
 }

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import {distMgr} from '@app/preload'
+import { distMgr } from '@app/preload'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { onMounted, ref } from 'vue'
 
 interface ProxyRule {
   path: string
@@ -32,22 +32,22 @@ const form = ref({
   name: '',
   path: '',
   port: 3000,
-  proxyRules: [] as ProxyRule[]
+  proxyRules: [] as ProxyRule[],
 })
 
 // 表单验证规则
 const rules: FormRules = {
   name: [
     { required: true, message: '请输入名称', trigger: 'blur' },
-    { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+    { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' },
   ],
   path: [
-    { required: true, message: '请选择目录路径', trigger: 'blur' }
+    { required: true, message: '请选择目录路径', trigger: 'blur' },
   ],
   port: [
     { required: true, message: '请输入端口号', trigger: 'blur' },
-    { type: 'number', min: 1024, max: 65535, message: '端口号范围 1024-65535', trigger: 'blur' }
-  ]
+    { type: 'number', min: 1024, max: 65535, message: '端口号范围 1024-65535', trigger: 'blur' },
+  ],
 }
 
 // 批量操作状态
@@ -59,18 +59,18 @@ onMounted(async () => {
 })
 
 // 批量启动所有服务
-const startAllServers = async () => {
-  if (batchLoading.value) return
-  
+async function startAllServers() {
+  if (batchLoading.value)
+    return
+
   try {
     batchLoading.value = 'start'
     const notRunningServers = distList.value.filter(dist => !dist.isActive)
-    
+
     if (notRunningServers.length === 0) {
       ElMessage.info('没有需要启动的服务')
       return
     }
-
 
     let successCount = 0
     let failCount = 0
@@ -80,46 +80,49 @@ const startAllServers = async () => {
       try {
         await distMgr.startServer(dist.id)
         successCount++
-        
-      } catch (error) {
+      }
+      catch (error) {
         console.error(`Failed to start server ${dist.id}:`, error)
         failCount++
       }
     }
-
 
     await loadDistList() // 先更新列表
 
     // 显示最终结果
     if (failCount === 0) {
       ElMessage.success(`成功启动 ${successCount} 个服务`)
-    } else {
+    }
+    else {
       ElMessage.warning(`${successCount} 个服务启动成功，${failCount} 个服务启动失败`)
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Batch start error:', error)
     ElMessage.error('批量启动服务失败')
     await loadDistList() // 确保发生错误时也更新列表
-  } finally {
+  }
+  finally {
     batchLoading.value = false
   }
 }
 
 // 批量停止所有服务
-const stopAllServers = async () => {
-  if (batchLoading.value) return
-  
+async function stopAllServers() {
+  if (batchLoading.value)
+    return
+
   try {
     batchLoading.value = 'stop'
     const runningServers = distList.value.filter(dist => dist.isActive)
-    
+
     if (runningServers.length === 0) {
       ElMessage.info('没有需要停止的服务')
       return
     }
 
     // 创建停止进度消息
-    
+
     let successCount = 0
     let failCount = 0
 
@@ -128,8 +131,8 @@ const stopAllServers = async () => {
       try {
         await distMgr.stopServer(dist.id)
         successCount++
-       
-      } catch (error) {
+      }
+      catch (error) {
         console.error(`Failed to stop server ${dist.id}:`, error)
         failCount++
       }
@@ -140,40 +143,44 @@ const stopAllServers = async () => {
     // 显示最终结果
     if (failCount === 0) {
       ElMessage.success(`成功停止 ${successCount} 个服务`)
-    } else {
+    }
+    else {
       ElMessage.warning(`${successCount} 个服务停止成功，${failCount} 个服务停止失败`)
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Batch stop error:', error)
     ElMessage.error('批量停止服务失败')
     await loadDistList() // 确保发生错误时也更新列表
-  } finally {
+  }
+  finally {
     batchLoading.value = false
   }
 }
 
 // 方法
-const loadDistList = async () => {
+async function loadDistList() {
   try {
     distList.value = await distMgr.getAllDists()
-  } catch (error) {
+  }
+  catch (error) {
     ElMessage.error('加载目录列表失败')
   }
 }
 
-const showAddDistDialog = () => {
+function showAddDistDialog() {
   isEditing.value = false
   form.value = {
     id: '',
     name: '',
     path: '',
     port: 3000,
-    proxyRules: []
+    proxyRules: [],
   }
   dialogVisible.value = true
 }
 
-const showEditDistDialog = (dist: DistConfig) => {
+function showEditDistDialog(dist: DistConfig) {
   isEditing.value = true
   // 创建一个新的纯数据对象
   form.value = {
@@ -185,41 +192,43 @@ const showEditDistDialog = (dist: DistConfig) => {
       path: rule.path,
       target: rule.target,
       changeOrigin: rule.changeOrigin ?? true,
-      secure: rule.secure ?? false
-    }))
+      secure: rule.secure ?? false,
+    })),
   }
   dialogVisible.value = true
 }
 
-const selectDirectory = async () => {
+async function selectDirectory() {
   try {
     const result = await distMgr.selectDirectory()
     if (result) {
       form.value.path = result
     }
-  } catch (error) {
+  }
+  catch (error) {
     ElMessage.error('选择目录失败')
   }
 }
 
-const addProxyRule = () => {
+function addProxyRule() {
   // 创建一个新的纯数据对象作为代理规则
   const newRule = {
     path: '',
     target: '',
     changeOrigin: true,
-    secure: false
+    secure: false,
   }
   form.value.proxyRules = [...form.value.proxyRules, newRule]
 }
 
-const removeProxyRule = (index: number) => {
+function removeProxyRule(index: number) {
   form.value.proxyRules.splice(index, 1)
 }
 
-const saveDistConfig = async () => {
-  if (!formRef.value) return
-  
+async function saveDistConfig() {
+  if (!formRef.value)
+    return
+
   await formRef.value.validate(async (valid) => {
     if (valid) {
       try {
@@ -229,28 +238,30 @@ const saveDistConfig = async () => {
           name: form.value.name,
           path: form.value.path,
           port: form.value.port,
-          isActive: false,  // 添加必需的 isActive 字段
+          isActive: false, // 添加必需的 isActive 字段
           proxyRules: form.value.proxyRules.map(rule => ({
             path: rule.path,
             target: rule.target,
             changeOrigin: rule.changeOrigin ?? true,
-            secure: rule.secure ?? false
-          }))
-        };
+            secure: rule.secure ?? false,
+          })),
+        }
 
         if (isEditing.value) {
-          console.log('updateDist', configData);
+          console.log('updateDist', configData)
           await distMgr.updateDist(configData)
           ElMessage.success('更新成功')
-        } else {
-          console.log('addDist', configData);
+        }
+        else {
+          console.log('addDist', configData)
           await distMgr.addDist(configData)
           ElMessage.success('添加成功')
         }
         dialogVisible.value = false
         await loadDistList()
-      } catch (error) {
-        console.log(error);
+      }
+      catch (error) {
+        console.log(error)
         ElMessage.error(isEditing.value ? '更新失败' : '添加失败')
       }
     }
@@ -265,9 +276,9 @@ onMounted(() => {
   loadingStates.value = {}
 })
 
-const toggleServer = async (dist: DistConfig) => {
+async function toggleServer(dist: DistConfig) {
   const serverId = dist.id
-  
+
   // 如果已经在加载状态，直接返回
   if (loadingStates.value[serverId]) {
     return
@@ -276,43 +287,46 @@ const toggleServer = async (dist: DistConfig) => {
   try {
     // 设置加载状态
     loadingStates.value[serverId] = true
-    
+
     if (dist.isActive) {
       await distMgr.stopServer(serverId)
       ElMessage.success('服务已停止')
-    } else {
+    }
+    else {
       await distMgr.startServer(serverId)
       ElMessage.success('服务已启动')
     }
 
     await loadDistList()
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Server toggle error:', error)
     ElMessage.error(dist.isActive ? '停止服务失败' : '启动服务失败')
     // 出错时恢复之前的状态
     await loadDistList()
-  } finally {
+  }
+  finally {
     // 清除加载状态
     loadingStates.value[serverId] = false
   }
 }
 
-const openInBrowser = (dist: DistConfig) => {
-  distMgr.openInBrowser('http://localhost:' + dist.port)
+function openInBrowser(dist: DistConfig) {
+  distMgr.openInBrowser(`http://localhost:${dist.port}`)
 }
 
-const confirmDelete = (dist: DistConfig) => {
+function confirmDelete(dist: DistConfig) {
   const serverId = dist.id // 提前获取ID，避免后续可能的引用问题
   const isActive = dist.isActive
-  
+
   ElMessageBox.confirm(
     '确定要删除这个目录吗？如果服务正在运行，会先停止服务。',
     '确认删除',
     {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-      type: 'warning'
-    }
+      type: 'warning',
+    },
   ).then(async () => {
     try {
       if (isActive) {
@@ -321,7 +335,8 @@ const confirmDelete = (dist: DistConfig) => {
       await distMgr.removeDist(serverId)
       ElMessage.success('删除成功')
       await loadDistList()
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Delete error:', error)
       ElMessage.error('删除失败')
     }
@@ -335,21 +350,25 @@ const confirmDelete = (dist: DistConfig) => {
       <div class="header-content">
         <h1>Dist Manager</h1>
         <div class="header-buttons">
-          <el-button 
-            type="success" 
-            @click="startAllServers" 
+          <el-button
+            type="success"
             :loading="batchLoading === 'start'"
-            :disabled="distList.every(dist => dist.isActive) || distList.length === 0">
+            :disabled="distList.every(dist => dist.isActive) || distList.length === 0"
+            @click="startAllServers"
+          >
             一键启动所有服务
           </el-button>
-          <el-button 
-            type="warning" 
-            @click="stopAllServers" 
+          <el-button
+            type="warning"
             :loading="batchLoading === 'stop'"
-            :disabled="distList.every(dist => !dist.isActive) || distList.length === 0">
+            :disabled="distList.every(dist => !dist.isActive) || distList.length === 0"
+            @click="stopAllServers"
+          >
             一键停止所有服务
           </el-button>
-          <el-button type="primary" @click="showAddDistDialog">添加目录</el-button>
+          <el-button type="primary" @click="showAddDistDialog">
+            添加目录
+          </el-button>
         </div>
       </div>
     </el-header>
@@ -370,13 +389,15 @@ const confirmDelete = (dist: DistConfig) => {
             <el-button-group>
               <el-button
                 :type="row.isActive ? 'danger' : 'success'"
-                @click="toggleServer(row)"
                 :loading="loadingStates[row.id]"
+                @click="toggleServer(row)"
               >
                 {{ row.isActive ? '停止' : '启动' }}
               </el-button>
-              <el-button @click="showEditDistDialog(row)">编辑</el-button>
-              <el-button @click="openInBrowser(row)" v-if="row.port">
+              <el-button @click="showEditDistDialog(row)">
+                编辑
+              </el-button>
+              <el-button v-if="row.port" @click="openInBrowser(row)">
                 打开
               </el-button>
               <el-button type="danger" @click="confirmDelete(row)">
@@ -387,7 +408,7 @@ const confirmDelete = (dist: DistConfig) => {
         </el-table-column>
       </el-table>
     </el-main>
-    
+
     <!-- 添加/编辑目录对话框 -->
     <el-dialog
       v-model="dialogVisible"
@@ -406,7 +427,9 @@ const confirmDelete = (dist: DistConfig) => {
         <el-form-item label="目录路径" prop="path">
           <el-input v-model="form.path" placeholder="选择目录">
             <template #append>
-              <el-button @click="selectDirectory">浏览</el-button>
+              <el-button @click="selectDirectory">
+                浏览
+              </el-button>
             </template>
           </el-input>
         </el-form-item>
@@ -418,20 +441,28 @@ const confirmDelete = (dist: DistConfig) => {
             placeholder="输入端口号"
           />
         </el-form-item>
-        
+
         <!-- 代理规则配置 -->
         <el-form-item label="代理规则">
           <div v-for="(rule, index) in form.proxyRules" :key="index" class="proxy-rule">
             <el-input v-model="rule.path" placeholder="路径 (如: /api)" />
             <el-input v-model="rule.target" placeholder="目标 (如: http://localhost:3000)" />
-            <el-button type="danger" @click="removeProxyRule(index)">删除</el-button>
+            <el-button type="danger" @click="removeProxyRule(index)">
+              删除
+            </el-button>
           </div>
-          <el-button type="primary" @click="addProxyRule">添加代理规则</el-button>
+          <el-button type="primary" @click="addProxyRule">
+            添加代理规则
+          </el-button>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveDistConfig">确定</el-button>
+        <el-button @click="dialogVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="saveDistConfig">
+          确定
+        </el-button>
       </template>
     </el-dialog>
   </el-container>
