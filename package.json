@@ -30,6 +30,8 @@
     "@antfu/eslint-config": "^5.4.1",
     "@npmcli/map-workspaces": "5.0.0",
     "@playwright/test": "1.55.0",
+    "@types/babel__generator": "^7.27.0",
+    "@types/babel__traverse": "^7.28.0",
     "@types/node": "24.5.2",
     "create-vite": "7.1.2",
     "electron": "38.1.2",
@@ -40,6 +42,7 @@
   },
   "dependencies": {
     "@app/main": "workspace:*",
-    "@app/preload": "workspace:*"
+    "@app/preload": "workspace:*",
+    "@app/vite-plugin-electron-ipc": "workspace:*"
   }
 }

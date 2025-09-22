@@ -1,3 +1,1 @@
-import distMgr from './distMgr.js'
-
-export { distMgr }
+export { apiClient, distMgr } from 'virtual:ipc-preload'
