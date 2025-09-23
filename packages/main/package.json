@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@app/electron-versions": "workspace:*",
+    "@app/vite-plugin-electron-ipc": "workspace:*",
     "@types/http-proxy-middleware": "^1.0.0",
     "@types/live-server": "^1.2.3",
     "electron-devtools-installer": "4.0.0",

@@ -1,9 +1,9 @@
 {
   "name": "dist-mgr",
-  "description": "Secure boilerplate for Electron app based on Vite",
+  "type": "module",
   "version": "3.1.0",
   "private": true,
-  "type": "module",
+  "description": "Secure boilerplate for Electron app based on Vite",
   "author": {
     "email": "baiawxk@qq.com",
     "name": "baiawxk",
@@ -27,6 +27,11 @@
     "integrate-renderer": "pnpm --filter @app/integrate-renderer start",
     "init": "pnpm run create-renderer && pnpm run integrate-renderer && pnpm install"
   },
+  "dependencies": {
+    "@app/main": "workspace:*",
+    "@app/preload": "workspace:*",
+    "@app/vite-plugin-electron-ipc": "workspace:*"
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^5.4.1",
     "@npmcli/map-workspaces": "5.0.0",
@@ -40,10 +45,5 @@
     "glob": "11.0.3",
     "jiti": "^2.5.1",
     "playwright": "^1.55.0"
-  },
-  "dependencies": {
-    "@app/main": "workspace:*",
-    "@app/preload": "workspace:*",
-    "@app/vite-plugin-electron-ipc": "workspace:*"
   }
 }

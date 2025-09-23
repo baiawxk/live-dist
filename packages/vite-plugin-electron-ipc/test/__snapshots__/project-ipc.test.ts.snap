@@ -2,18 +2,18 @@
 
 exports[`iPC Plugin - Real Project Files > should generate main registration code for real project 1`] = `
 "
-import { openInBrowser } from '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc/app.ts';
-import { selectAppDirectory } from '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc/app.ts';
-import { getAllDists } from '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc/distMgr.ts';
-import { addDist } from '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc/distMgr.ts';
-import { updateDist } from '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc/distMgr.ts';
-import { removeDist } from '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc/distMgr.ts';
-import { getDist } from '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc/distMgr.ts';
-import { updateDistStatus } from '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc/distMgr.ts';
-import { selectDistDirectory } from '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc/distMgr.ts';
-import { startServer } from '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc/server.ts';
-import { stopServer } from '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc/server.ts';
-import { getServerStatus } from '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc/server.ts';
+import { openInBrowser } from 'E:/workspaces/live-dist/packages/main/src/ipc/app.ts';
+import { selectAppDirectory } from 'E:/workspaces/live-dist/packages/main/src/ipc/app.ts';
+import { getAllDists } from 'E:/workspaces/live-dist/packages/main/src/ipc/distMgr.ts';
+import { addDist } from 'E:/workspaces/live-dist/packages/main/src/ipc/distMgr.ts';
+import { updateDist } from 'E:/workspaces/live-dist/packages/main/src/ipc/distMgr.ts';
+import { removeDist } from 'E:/workspaces/live-dist/packages/main/src/ipc/distMgr.ts';
+import { getDist } from 'E:/workspaces/live-dist/packages/main/src/ipc/distMgr.ts';
+import { updateDistStatus } from 'E:/workspaces/live-dist/packages/main/src/ipc/distMgr.ts';
+import { selectDistDirectory } from 'E:/workspaces/live-dist/packages/main/src/ipc/distMgr.ts';
+import { startServer } from 'E:/workspaces/live-dist/packages/main/src/ipc/server.ts';
+import { stopServer } from 'E:/workspaces/live-dist/packages/main/src/ipc/server.ts';
+import { getServerStatus } from 'E:/workspaces/live-dist/packages/main/src/ipc/server.ts';
 import { ipcMain } from 'electron';
 
 export function registerIPCFunctions() {
@@ -47,6 +47,7 @@ ipcMain.handle('getServerStatus', (_, ...args) => getServerStatus(...args));
 
 exports[`iPC Plugin - Real Project Files > should generate preload client code for real project 1`] = `
 "
+import { ipcRenderer } from 'electron'
 
 // 按文件名分组的API对象
 export const app = {

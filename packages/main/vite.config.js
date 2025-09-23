@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process'
+import { resolve } from 'node:path'
 import { getNodeMajorVersion } from '@app/electron-versions'
 import electronIPCPlugin from '@app/vite-plugin-electron-ipc'
 import electronPath from 'electron'
@@ -29,9 +30,9 @@ export default /**
   plugins: [
     electronIPCPlugin({
       // 更新扫描目录为 ipc 目录
-      scanDir: '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc',
+      scanDir: resolve(import.meta.dirname, './main/src/ipc'),
       // 排除不需要注册为IPC的函数
-      excludeFunctions: []
+      excludeFunctions: [],
     }),
     handleHotReload(),
   ],

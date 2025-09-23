@@ -83,6 +83,9 @@ importers:
       '@app/electron-versions':
         specifier: workspace:*
         version: link:../electron-versions
+      '@app/vite-plugin-electron-ipc':
+        specifier: workspace:*
+        version: link:../vite-plugin-electron-ipc
       '@types/http-proxy-middleware':
         specifier: ^1.0.0
         version: 1.0.0
@@ -104,6 +107,9 @@ importers:
       '@app/electron-versions':
         specifier: workspace:*
         version: link:../electron-versions
+      '@app/vite-plugin-electron-ipc':
+        specifier: workspace:*
+        version: link:../vite-plugin-electron-ipc
       mlly:
         specifier: 1.8.0
         version: 1.8.0

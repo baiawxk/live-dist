@@ -346,6 +346,7 @@ export function registerIPCFunctions() {
       ).join(',\n  ')
 
       s.append(`
+import { ipcRenderer } from 'electron'
 
 // 按文件名分组的API对象
 ${fileGroups}
@@ -378,9 +379,6 @@ ${fileGroups}
       })
 
       s.append(`
-        
-import { ipcRenderer } from 'electron/renderer';
-
 // 按文件名分组的API对象类型定义
 ${Object.keys(groupedFunctions).map((name) => {
   const functions = groupedFunctions[name].map((fn) => {

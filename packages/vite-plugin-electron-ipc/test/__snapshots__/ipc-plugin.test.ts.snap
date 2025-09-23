@@ -2,8 +2,8 @@
 
 exports[`iPC Plugin > should generate main registration code correctly 1`] = `
 "
-import { testFunction } from '/Users/chenhongqiang/workspace/live-dist/packages/vite-plugin-electron-ipc/test/temp-ipc/testApi.ts';
-import { syncFunction } from '/Users/chenhongqiang/workspace/live-dist/packages/vite-plugin-electron-ipc/test/temp-ipc/testApi.ts';
+import { testFunction } from 'E:/workspaces/live-dist/packages/vite-plugin-electron-ipc/test/temp-ipc/testApi.ts';
+import { syncFunction } from 'E:/workspaces/live-dist/packages/vite-plugin-electron-ipc/test/temp-ipc/testApi.ts';
 import { ipcMain } from 'electron';
 
 export function registerIPCFunctions() {
@@ -17,6 +17,7 @@ ipcMain.handle('syncFunction', (_, ...args) => syncFunction(...args));
 
 exports[`iPC Plugin > should generate preload client code correctly 1`] = `
 "
+import { ipcRenderer } from 'electron'
 
 // 按文件名分组的API对象
 export const testApi = {
