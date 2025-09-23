@@ -20,6 +20,7 @@
     "build": "pnpm --filter=\"*\" run build",
     "compile": "pnpm run build && electron-builder build --config electron-builder.mjs",
     "test": "playwright test ./tests/e2e.spec.ts",
+    "test:unit": "pnpm --filter=\"*\" run test",
     "start": "node packages/dev-mode.js",
     "typecheck": "pnpm --filter=\"*\" run typecheck",
     "create-renderer": "cd packages && node ./integrate-renderer/create-renderer.js",

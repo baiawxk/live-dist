@@ -345,15 +345,11 @@ export function registerIPCFunctions() {
         `${fn.name}: (...args) => ipcRenderer.invoke('${fn.name}', ...args)`,
       ).join(',\n  ')
 
-      const compatExports = `export const ipcClient = {\n  ${compatFunctions}\n};`
-
       s.append(`
 
 // 按文件名分组的API对象
 ${fileGroups}
 
-// 兼容对象（使用函数名作为通道名，为了向后兼容）
-${compatExports}
 `)
       console.log(s.toString())
       return s.toString()

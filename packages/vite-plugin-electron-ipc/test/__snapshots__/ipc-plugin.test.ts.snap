@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`iPC Plugin > should generate main registration code correctly 1`] = `
+"
+import { testFunction } from '/Users/chenhongqiang/workspace/live-dist/packages/vite-plugin-electron-ipc/test/temp-ipc/testApi.ts';
+import { syncFunction } from '/Users/chenhongqiang/workspace/live-dist/packages/vite-plugin-electron-ipc/test/temp-ipc/testApi.ts';
+import { ipcMain } from 'electron';
+
+export function registerIPCFunctions() {
+  ipcMain.handle('testApi:testFunction', (_, ...args) => testFunction(...args));
+ipcMain.handle('testApi:syncFunction', (_, ...args) => syncFunction(...args));
+  ipcMain.handle('testFunction', (_, ...args) => testFunction(...args));
+ipcMain.handle('syncFunction', (_, ...args) => syncFunction(...args));
+}
+"
+`;
+
+exports[`iPC Plugin > should generate preload client code correctly 1`] = `
+"
+
+// 按文件名分组的API对象
+export const testApi = {
+  testFunction: (...args) => ipcRenderer.invoke('testApi:testFunction', ...args),
+  syncFunction: (...args) => ipcRenderer.invoke('testApi:syncFunction', ...args)
+};
+
+"
+`;
