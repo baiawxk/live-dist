@@ -1,5 +1,7 @@
 import { spawn } from 'node:child_process'
+import { resolve } from 'node:path'
 import { getNodeMajorVersion } from '@app/electron-versions'
+import electronIPCPlugin from '@app/vite-plugin-electron-ipc'
 import electronPath from 'electron'
 
 export default /**
@@ -26,6 +28,13 @@ export default /**
     reportCompressedSize: false,
   },
   plugins: [
+    electronIPCPlugin({
+      // 更新扫描目录为 ipc 目录
+      scanDir: resolve(import.meta.dirname, './src/ipc'),
+      mainRegistryFile: resolve(import.meta.dirname, './src/generated/ipc-registry.ts'),
+      rendererRegistryFile: resolve(import.meta.dirname, '../preload/src/generated/ipc-registry.ts'),
+      typesFile: resolve(import.meta.dirname, '../preload/src/generated/ipc.d.ts'),
+    }),
     handleHotReload(),
   ],
 })

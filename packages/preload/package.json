@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@app/electron-versions": "workspace:*",
+    "@app/vite-plugin-electron-ipc": "workspace:*",
     "mlly": "1.8.0",
     "typescript": "5.9.2",
     "vite": "7.1.6"

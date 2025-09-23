@@ -1,4 +1,6 @@
+import { resolve } from 'node:path'
 import { getChromeMajorVersion } from '@app/electron-versions'
+import electronIPCPlugin from '@app/vite-plugin-electron-ipc'
 import { resolveModuleExportNames } from 'mlly'
 
 export default /**
@@ -27,7 +29,18 @@ export default /**
     emptyOutDir: true,
     reportCompressedSize: false,
   },
-  plugins: [mockExposed(), handleHotReload()],
+  plugins: [
+    electronIPCPlugin({
+      // 扫描API函数的目录路径
+      scanDir: resolve(import.meta.dirname, '../main/src/ipc'),
+      // 排除不需要注册为IPC的函数
+      excludeFunctions: [],
+      // 类型定义文件输出路径
+      typeDefinitionFile: resolve(import.meta.dirname, './types/ipc.d.ts'),
+    }),
+    mockExposed(),
+    handleHotReload(),
+  ],
 })
 
 /**
@@ -63,6 +76,7 @@ function mockExposed() {
         const exportedNames = await resolveModuleExportNames('./src/index.ts', {
           url: import.meta.url,
         })
+        console.log({ exportedNames })
         return exportedNames.reduce((s, key) => {
           return (
             s

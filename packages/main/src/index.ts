@@ -7,6 +7,7 @@ import { allowExternalUrls } from './modules/ExternalUrls.js'
 import { hardwareAccelerationMode } from './modules/HardwareAccelerationModule.js'
 import { createIPCHandlerModule } from './modules/IPCHandlerModule.js'
 import { disallowMultipleAppInstance } from './modules/SingleInstanceApp.js'
+import { createTrayIconModule } from './modules/TrayIconModule.js'
 import { createWindowManagerModule } from './modules/WindowManager.js'
 
 export async function initApp(initConfig: AppInitConfig) {
@@ -17,6 +18,7 @@ export async function initApp(initConfig: AppInitConfig) {
     .init(hardwareAccelerationMode({ enable: false }))
     .init(autoUpdater())
     .init(createIPCHandlerModule())
+    .init(createTrayIconModule())
 
   // Install DevTools extension if needed
   // .init(chromeDevToolsExtension({extension: 'VUEJS3_DEVTOOLS'}))

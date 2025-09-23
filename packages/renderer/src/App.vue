@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormInstance, FormRules } from 'element-plus'
-import { distMgr } from '@app/preload'
+import { distMgr, server, app } from '@app/preload'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { onMounted, ref } from 'vue'
 
@@ -78,7 +78,7 @@ async function startAllServers() {
     // 依次启动每个服务
     for (const dist of notRunningServers) {
       try {
-        await distMgr.startServer(dist.id)
+        await server.startServer(dist.id)
         successCount++
       }
       catch (error) {
@@ -129,7 +129,7 @@ async function stopAllServers() {
     // 依次停止每个服务
     for (const dist of runningServers) {
       try {
-        await distMgr.stopServer(dist.id)
+        await server.stopServer(dist.id)
         successCount++
       }
       catch (error) {
@@ -200,7 +200,7 @@ function showEditDistDialog(dist: DistConfig) {
 
 async function selectDirectory() {
   try {
-    const result = await distMgr.selectDirectory()
+    const result = await app.selectAppDirectory()
     if (result) {
       form.value.path = result
     }
@@ -249,7 +249,7 @@ async function saveDistConfig() {
 
         if (isEditing.value) {
           console.log('updateDist', configData)
-          await distMgr.updateDist(configData)
+          await distMgr.updateDist(configData.id, configData)
           ElMessage.success('更新成功')
         }
         else {
@@ -289,11 +289,11 @@ async function toggleServer(dist: DistConfig) {
     loadingStates.value[serverId] = true
 
     if (dist.isActive) {
-      await distMgr.stopServer(serverId)
+      await server.stopServer(serverId)
       ElMessage.success('服务已停止')
     }
     else {
-      await distMgr.startServer(serverId)
+      await server.startServer(serverId)
       ElMessage.success('服务已启动')
     }
 
@@ -312,7 +312,7 @@ async function toggleServer(dist: DistConfig) {
 }
 
 function openInBrowser(dist: DistConfig) {
-  distMgr.openInBrowser(`http://localhost:${dist.port}`)
+  app.openInBrowser(`http://localhost:${dist.port}`)
 }
 
 function confirmDelete(dist: DistConfig) {
@@ -330,7 +330,7 @@ function confirmDelete(dist: DistConfig) {
   ).then(async () => {
     try {
       if (isActive) {
-        await distMgr.stopServer(serverId)
+        await server.stopServer(serverId)
       }
       await distMgr.removeDist(serverId)
       ElMessage.success('删除成功')
