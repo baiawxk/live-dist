@@ -2,6 +2,7 @@ import type { Node, NodePath } from '@babel/traverse'
 import type { File } from '@babel/types'
 import type { Plugin } from 'vite'
 import { readFile, writeFile } from 'node:fs/promises'
+import * as fs from 'node:fs/promises'
 import path, { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import generate from '@babel/generator'
@@ -28,6 +29,10 @@ interface IPCPluginOptions {
   ignorePattern?: string[]
   // 应该排除的函数名（不注册为IPC）
   excludeFunctions?: string[]
+  // 生成的主进程注册文件路径
+  mainRegistryFile?: string
+  // 生成的preload客户端文件路径
+  preloadClientFile?: string
   // 类型定义文件输出路径（仅preload进程需要）
   typeDefinitionFile?: string
 }
@@ -35,11 +40,6 @@ interface IPCPluginOptions {
 // 已移除InterfaceDefinition接口，使用简单的typeof import("module").Type方式处理类型定义
 
 export default function electronIPCPlugin(options: IPCPluginOptions = {}): Plugin {
-  const virtualMainModuleId = 'virtual:ipc-main'
-  const resolvedVirtualMainModuleId = `\0${virtualMainModuleId}`
-  const virtualPreloadModuleId = 'virtual:ipc-preload'
-  const resolvedVirtualPreloadModuleId = `\0${virtualPreloadModuleId}`
-
   const apiFunctions: IPCFunction[] = []
   // 已移除interfaceDefinitions，使用简单的占位符方式处理类型定义
   const __dirname = fileURLToPath(new URL('.', import.meta.url))
@@ -50,11 +50,16 @@ export default function electronIPCPlugin(options: IPCPluginOptions = {}): Plugi
     filePattern: '**/*.ts',
     ignorePattern: ['**/node_modules/**', '**/dist/**'],
     excludeFunctions: [],
-    typeDefinitionFile: process.env.IPC_TYPE_DEFINITION_FILE || '../preload/src/ipc-types.d.ts',
+    mainRegistryFile: process.env.IPC_MAIN_REGISTRY_FILE || '../main/src/generated/ipc-registry.ts',
+    preloadClientFile: process.env.IPC_PRELOAD_CLIENT_FILE || '../preload/src/generated/ipc-client.ts',
+    typeDefinitionFile: process.env.IPC_TYPE_DEFINITION_FILE || '../renderer/src/ipc-types.d.ts',
   }
 
   // 合并配置
   const config = { ...defaultOptions, ...options }
+
+  // 确保路径是绝对路径
+  const resolvePath = (relativePath: string) => resolve(process.cwd(), relativePath);
 
   // 定义插件内部方法
   const scanAPIFunctions = async () => {
@@ -291,18 +296,12 @@ export default function electronIPCPlugin(options: IPCPluginOptions = {}): Plugi
         `ipcMain.handle('${fn.fileName}:${fn.name}', (_, ...args) => ${fn.exportName}(...args));`,
       ).join('\n')
 
-      // 为所有函数生成额外的注册语句（为了向后兼容）
-      const compatRegistrations = filteredFunctions.map(fn =>
-        `ipcMain.handle('${fn.name}', (_, ...args) => ${fn.exportName}(...args));`,
-      ).join('\n')
-
       s.append(`
 ${imports}
 import { ipcMain } from 'electron';
 
 export function registerIPCFunctions() {
   ${registrations}
-  ${compatRegistrations}
 }
 `)
 
@@ -335,10 +334,10 @@ export function registerIPCFunctions() {
       const fileGroups = Object.keys(groupedFunctions).map((fileName) => {
         const fns = groupedFunctions[fileName]
         const functions = fns.map(fn =>
-          `${fn.name}: (...args) => ipcRenderer.invoke('${fn.fileName}:${fn.name}', ...args)`,
-        ).join(',\n  ')
-        return `export const ${fileName} = {\n  ${functions}\n};`
-      }).join('\n\n')
+          `${fn.name}: (...args: any[]) => ipcRenderer.invoke('${fn.fileName}:${fn.name}', ...args)`
+        ).join(',\n    ')
+        return `  ${fileName}: {\n    ${functions}\n  }`
+      }).join(',\n')
 
       // 生成兼容对象（使用函数名作为通道名，为了向后兼容）
       const compatFunctions = filteredFunctions.map(fn =>
@@ -346,11 +345,16 @@ export function registerIPCFunctions() {
       ).join(',\n  ')
 
       s.append(`
-import { ipcRenderer } from 'electron'
+import { ipcRenderer, contextBridge } from 'electron'
 
 // 按文件名分组的API对象
+export const electronAPI = {
 ${fileGroups}
+};
 
+export function exposeIPCFunctions() {
+  contextBridge.exposeInMainWorld('ElectronAPI', electronAPI);
+}
 `)
       console.log(s.toString())
       return s.toString()
@@ -378,19 +382,17 @@ ${fileGroups}
         groupedFunctions[fn.fileName].push(fn)
       })
 
-      s.append(`
-// 按文件名分组的API对象类型定义
-${Object.keys(groupedFunctions).map((name) => {
-  const functions = groupedFunctions[name].map((fn) => {
-    // 计算相对于typeDefinitionFile的路径
-    const relativePath = path.relative(path.dirname(config.typeDefinitionFile || ''), fn.filePath).replace(/\\/g, '/')
-    return `${fn.name}: typeof import('${relativePath}').${fn.exportName};`
-  }).join('\n  ')
-  return `export const ${name}: {
-  ${functions}
-};`
-}).join('\n\n')}
-`)
+      // 生成接口定义
+      const interfaceDefinitions = Object.keys(groupedFunctions).map((fileName) => {
+        const functions = groupedFunctions[fileName].map((fn) => {
+          // 计算相对于typeDefinitionFile的路径
+          const relativePath = path.relative(path.dirname(config.typeDefinitionFile || ''), fn.filePath).replace(/\\/g, '/')
+          return `    ${fn.name}: typeof import('${relativePath}').${fn.exportName};`
+        }).join('\n')
+        return `  ${fileName}: {\n${functions}\n  };`
+      }).join('\n')
+
+      s.append(`\nexport interface ElectronAPI {\n${interfaceDefinitions}\n}\n\ndeclare global {\n  interface Window {\n    ElectronAPI: ElectronAPI;\n  }\n}\n`)
 
       return s.toString()
     }
@@ -404,13 +406,60 @@ ${Object.keys(groupedFunctions).map((name) => {
     try {
       // 只有当配置了typeDefinitionFile时才写入文件
       if (config.typeDefinitionFile) {
-        const typeDefPath = resolve(process.cwd(), config.typeDefinitionFile)
+        const typeDefPath = resolvePath(config.typeDefinitionFile)
+        // 确保目录存在
+        const dir = path.dirname(typeDefPath)
+        try {
+          await fs.mkdir(dir, { recursive: true })
+        } catch (error) {
+          // 目录可能已存在
+        }
         await writeFile(typeDefPath, typeDefinitions)
         console.log(`Type definitions written to ${typeDefPath}`)
       }
     }
     catch (error) {
       console.error('Error writing type definitions:', error)
+    }
+  }
+
+  const writeMainRegistryFile = async (code: string) => {
+    try {
+      if (config.mainRegistryFile) {
+        const mainRegistryPath = resolvePath(config.mainRegistryFile)
+        // 确保目录存在
+        const dir = path.dirname(mainRegistryPath)
+        try {
+          await fs.mkdir(dir, { recursive: true })
+        } catch (error) {
+          // 目录可能已存在
+        }
+        await writeFile(mainRegistryPath, code)
+        console.log(`Main registry file written to ${mainRegistryPath}`)
+      }
+    }
+    catch (error) {
+      console.error('Error writing main registry file:', error)
+    }
+  }
+
+  const writePreloadClientFile = async (code: string) => {
+    try {
+      if (config.preloadClientFile) {
+        const preloadClientPath = resolvePath(config.preloadClientFile)
+        // 确保目录存在
+        const dir = path.dirname(preloadClientPath)
+        try {
+          await fs.mkdir(dir, { recursive: true })
+        } catch (error) {
+          // 目录可能已存在
+        }
+        await writeFile(preloadClientPath, code)
+        console.log(`Preload client file written to ${preloadClientPath}`)
+      }
+    }
+    catch (error) {
+      console.error('Error writing preload client file:', error)
     }
   }
 
@@ -429,46 +478,25 @@ ${Object.keys(groupedFunctions).map((name) => {
       }
     },
 
-    resolveId(id) {
-      if (id === virtualMainModuleId) {
-        return resolvedVirtualMainModuleId
+    async buildStart() {
+      try {
+        // 扫描API函数
+        await scanAPIFunctions()
+        
+        // 生成并写入主进程注册文件
+        const mainRegistrationCode = generateMainRegistrationCode()
+        await writeMainRegistryFile(mainRegistrationCode)
+        
+        // 生成并写入preload客户端文件
+        const preloadClientCode = generatePreloadClientCode()
+        await writePreloadClientFile(preloadClientCode)
+        
+        // 生成并写入类型定义文件
+        const typeDefinitions = generateTypeDefinitions()
+        await writeTypeDefinitions(typeDefinitions)
       }
-      if (id === virtualPreloadModuleId) {
-        return resolvedVirtualPreloadModuleId
-      }
-    },
-
-    async load(id) {
-      if (id === resolvedVirtualMainModuleId) {
-        try {
-          // 重新扫描API函数以确保最新
-          await scanAPIFunctions()
-          // 生成主进程注册代码
-          const mainRegistrationCode = generateMainRegistrationCode()
-          return mainRegistrationCode
-        }
-        catch (error) {
-          console.error('Error in load for main module:', error)
-          return ''
-        }
-      }
-
-      if (id === resolvedVirtualPreloadModuleId) {
-        try {
-          // 重新扫描API函数以确保最新
-          await scanAPIFunctions()
-          // 生成preload客户端代码
-          const preloadClientCode = generatePreloadClientCode()
-          // 生成类型定义
-          const typeDefinitions = generateTypeDefinitions()
-          // 写入类型定义文件
-          await writeTypeDefinitions(typeDefinitions)
-          return preloadClientCode
-        }
-        catch (error) {
-          console.error('Error in load for preload module:', error)
-          return ''
-        }
+      catch (error) {
+        console.error('Error in buildStart:', error)
       }
     },
   }

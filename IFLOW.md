@@ -85,6 +85,7 @@ npm run init
 1. **模块化架构**: 应用程序采用模块化设计，每个功能都是一个独立的模块。
 2. **安全性**: 遵循 Electron 安全指南，使用上下文隔离和预加载脚本。
 3. **TypeScript**: 全项目使用 TypeScript 进行类型检查。
-4. **Monorepo**: 使用 npm workspaces 管理多个包。
+4. **Monorepo**: 使用 pnpm workspaces 管理多个包。
 5. **环境变量**: 使用 `import.meta.env` 访问环境变量，只有以 `VITE_` 为前缀的变量才会暴露给客户端代码。
 6. **IPC 通信**: 使用 `vite-plugin-electron-ipc` 插件自动处理 IPC 通信，无需手动注册。
+7. **测试驱动开发**: 使用 `vitest` 和 `playwright` 进行单元测试和端到端测试。每个新的实现都应伴随相应的测试。不破坏旧的功能。

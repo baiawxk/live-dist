@@ -30,9 +30,10 @@ export default /**
   plugins: [
     electronIPCPlugin({
       // 更新扫描目录为 ipc 目录
-      scanDir: resolve(import.meta.dirname, './main/src/ipc'),
-      // 排除不需要注册为IPC的函数
-      excludeFunctions: [],
+      scanDir: resolve(import.meta.dirname, './src/ipc'),
+      mainRegistryFile: resolve(import.meta.dirname, './src/generated/ipc-registry.ts'),
+      rendererRegistryFile: resolve(import.meta.dirname, '../preload/src/generated/ipc-registry.ts'),
+      typesFile: resolve(import.meta.dirname, '../preload/src/generated/ipc.d.ts'),
     }),
     handleHotReload(),
   ],

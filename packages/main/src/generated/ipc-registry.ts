@@ -1,7 +1,4 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`iPC Plugin - Real Project Files > should generate main registration code for real project 1`] = `
-"
 import { openInBrowser } from 'E:/workspaces/live-dist/packages/main/src/ipc/app.ts';
 import { selectAppDirectory } from 'E:/workspaces/live-dist/packages/main/src/ipc/app.ts';
 import { getAllDists } from 'E:/workspaces/live-dist/packages/main/src/ipc/distMgr.ts';
@@ -30,34 +27,3 @@ ipcMain.handle('server:startServer', (_, ...args) => startServer(...args));
 ipcMain.handle('server:stopServer', (_, ...args) => stopServer(...args));
 ipcMain.handle('server:getServerStatus', (_, ...args) => getServerStatus(...args));
 }
-"
-`;
-
-exports[`iPC Plugin - Real Project Files > should generate preload client code for real project 1`] = `
-"
-import { ipcRenderer } from 'electron'
-
-// 按文件名分组的API对象
-export const app = {
-  openInBrowser: (...args) => ipcRenderer.invoke('app:openInBrowser', ...args),
-  selectAppDirectory: (...args) => ipcRenderer.invoke('app:selectAppDirectory', ...args)
-};
-
-export const distMgr = {
-  getAllDists: (...args) => ipcRenderer.invoke('distMgr:getAllDists', ...args),
-  addDist: (...args) => ipcRenderer.invoke('distMgr:addDist', ...args),
-  updateDist: (...args) => ipcRenderer.invoke('distMgr:updateDist', ...args),
-  removeDist: (...args) => ipcRenderer.invoke('distMgr:removeDist', ...args),
-  getDist: (...args) => ipcRenderer.invoke('distMgr:getDist', ...args),
-  updateDistStatus: (...args) => ipcRenderer.invoke('distMgr:updateDistStatus', ...args),
-  selectDistDirectory: (...args) => ipcRenderer.invoke('distMgr:selectDistDirectory', ...args)
-};
-
-export const server = {
-  startServer: (...args) => ipcRenderer.invoke('server:startServer', ...args),
-  stopServer: (...args) => ipcRenderer.invoke('server:stopServer', ...args),
-  getServerStatus: (...args) => ipcRenderer.invoke('server:getServerStatus', ...args)
-};
-
-"
-`;

@@ -9,8 +9,6 @@ import { ipcMain } from 'electron';
 export function registerIPCFunctions() {
   ipcMain.handle('testApi:testFunction', (_, ...args) => testFunction(...args));
 ipcMain.handle('testApi:syncFunction', (_, ...args) => syncFunction(...args));
-  ipcMain.handle('testFunction', (_, ...args) => testFunction(...args));
-ipcMain.handle('syncFunction', (_, ...args) => syncFunction(...args));
 }
 "
 `;

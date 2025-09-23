@@ -9,6 +9,9 @@ const __dirname = dirname(__filename)
 
 // 创建临时 IPC 函数目录用于测试
 const tempIpcDir = resolve(__dirname, 'temp-ipc')
+const tempMainRegistryFile = resolve(__dirname, 'temp-ipc-registry.ts')
+const tempPreloadClientFile = resolve(__dirname, 'temp-ipc-client.ts')
+const tempTypeDefFile = resolve(__dirname, 'temp-types.d.ts')
 
 describe('iPC Plugin', () => {
   beforeEach(async () => {
@@ -31,9 +34,12 @@ export function syncFunction(value: number): number {
   })
 
   afterEach(async () => {
-    // 清理临时目录
+    // 清理临时目录和文件
     try {
       await fs.rm(tempIpcDir, { recursive: true, force: true })
+      await fs.rm(tempMainRegistryFile, { force: true })
+      await fs.rm(tempPreloadClientFile, { force: true })
+      await fs.rm(tempTypeDefFile, { force: true })
     }
     catch (error) {
       // 忽略删除错误
@@ -43,78 +49,89 @@ export function syncFunction(value: number): number {
   it('should scan IPC functions correctly', async () => {
     const ipcPlugin = plugin({
       scanDir: tempIpcDir,
-      typeDefinitionFile: resolve(__dirname, 'temp-types.d.ts'),
+      mainRegistryFile: tempMainRegistryFile,
+      preloadClientFile: tempPreloadClientFile,
+      typeDefinitionFile: tempTypeDefFile,
     })
 
     // 模拟配置解析
     await ipcPlugin.configResolved({ mode: 'development' })
+    
+    // 模拟构建开始
+    await ipcPlugin.buildStart()
 
-    // 检查虚拟模块 ID 解析
-    const resolvedMainId = ipcPlugin.resolveId('virtual:ipc-main')
-    const resolvedPreloadId = ipcPlugin.resolveId('virtual:ipc-preload')
+    // 检查生成的文件是否存在
+    const mainRegistryExists = await fs.access(tempMainRegistryFile).then(() => true).catch(() => false)
+    const preloadClientExists = await fs.access(tempPreloadClientFile).then(() => true).catch(() => false)
+    const typeDefExists = await fs.access(tempTypeDefFile).then(() => true).catch(() => false)
 
-    expect(resolvedMainId).toBe('\0virtual:ipc-main')
-    expect(resolvedPreloadId).toBe('\0virtual:ipc-preload')
+    expect(mainRegistryExists).toBe(true)
+    expect(preloadClientExists).toBe(true)
+    expect(typeDefExists).toBe(true)
   })
 
   it('should generate main registration code correctly', async () => {
     const ipcPlugin = plugin({
       scanDir: tempIpcDir,
-      typeDefinitionFile: resolve(__dirname, 'temp-types.d.ts'),
+      mainRegistryFile: tempMainRegistryFile,
+      preloadClientFile: tempPreloadClientFile,
+      typeDefinitionFile: tempTypeDefFile,
     })
 
     // 模拟配置解析
     await ipcPlugin.configResolved({ mode: 'development' })
+    
+    // 模拟构建开始
+    await ipcPlugin.buildStart()
 
-    // 生成主进程代码
-    const mainCode = await ipcPlugin.load('\0virtual:ipc-main')
-
-    expect(mainCode).matchSnapshot()
+    // 检查生成的主进程注册代码
+    const mainCode = await fs.readFile(tempMainRegistryFile, 'utf-8')
+    expect(mainCode).toContain('import { testFunction, syncFunction } from')
+    expect(mainCode).toContain('ipcMain.handle(\'testApi:testFunction\'')
+    expect(mainCode).toContain('ipcMain.handle(\'testApi:syncFunction\'')
+    expect(mainCode).toContain('export function registerIPCFunctions()')
   })
 
   it('should generate preload client code correctly', async () => {
     const ipcPlugin = plugin({
       scanDir: tempIpcDir,
-      typeDefinitionFile: resolve(__dirname, 'temp-types.d.ts'),
+      mainRegistryFile: tempMainRegistryFile,
+      preloadClientFile: tempPreloadClientFile,
+      typeDefinitionFile: tempTypeDefFile,
     })
 
     // 模拟配置解析
     await ipcPlugin.configResolved({ mode: 'development' })
+    
+    // 模拟构建开始
+    await ipcPlugin.buildStart()
 
-    // 生成 preload 代码
-    const preloadCode = await ipcPlugin.load('\0virtual:ipc-preload')
-
-    expect(preloadCode).matchSnapshot()
+    // 检查生成的preload客户端代码
+    const preloadCode = await fs.readFile(tempPreloadClientFile, 'utf-8')
+    expect(preloadCode).toContain('import { ipcRenderer } from \'electron\'')
+    expect(preloadCode).toContain('export const testApi = {')
+    expect(preloadCode).toContain('testFunction: (...args) => ipcRenderer.invoke(\'testApi:testFunction\'')
+    expect(preloadCode).toContain('syncFunction: (...args) => ipcRenderer.invoke(\'testApi:syncFunction\'')
   })
 
   it('should generate type definitions correctly', async () => {
-    const typeDefFile = resolve(__dirname, 'temp-types.d.ts')
     const ipcPlugin = plugin({
       scanDir: tempIpcDir,
-      typeDefinitionFile: typeDefFile,
+      mainRegistryFile: tempMainRegistryFile,
+      preloadClientFile: tempPreloadClientFile,
+      typeDefinitionFile: tempTypeDefFile,
     })
 
     // 模拟配置解析
     await ipcPlugin.configResolved({ mode: 'development' })
+    
+    // 模拟构建开始
+    await ipcPlugin.buildStart()
 
-    // 生成 preload 代码（这会触发类型定义的生成）
-    await ipcPlugin.load('\0virtual:ipc-preload')
-
-    // 检查类型定义文件是否创建
-    try {
-      const typeDefs = await fs.readFile(typeDefFile, 'utf-8')
-      expect(typeDefs).toContain('export const testApi: {')
-      expect(typeDefs).toContain('testFunction: typeof import(')
-      expect(typeDefs).toContain('syncFunction: typeof import(')
-    }
-    finally {
-      // 清理类型定义文件
-      try {
-        await fs.rm(typeDefFile, { force: true })
-      }
-      catch (error) {
-        // 忽略删除错误
-      }
-    }
+    // 检查生成的类型定义文件
+    const typeDefs = await fs.readFile(tempTypeDefFile, 'utf-8')
+    expect(typeDefs).toContain('export const testApi: {')
+    expect(typeDefs).toContain('testFunction: typeof import(')
+    expect(typeDefs).toContain('syncFunction: typeof import(')
   })
 })

@@ -3,7 +3,7 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./src/ipc-types.d.ts",
+      "types": "./src/index.ts",
       "default": "./dist/_virtual_browser.mjs"
     },
     "./exposed.mjs": {

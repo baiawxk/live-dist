@@ -1,7 +1,5 @@
-import type { DistConfig } from './distMgr.js'
-import { getDist } from './distMgr.js'
-import { updateDistStatus } from './distMgr.js'
 import { LiveServerManager } from '../modules/LiveServerManager.js'
+import { getDist, updateDistStatus } from './distMgr.js'
 
 // 创建服务器管理器实例
 const serverManager = new LiveServerManager()

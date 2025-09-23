@@ -1,4 +1,5 @@
-import type { DistConfig, ProxyConfig } from './DistManager.js'
+import type { ProxyConfig } from 'electron'
+import type { DistConfig } from 'src/ipc/distMgr.js'
 import { exec } from 'node:child_process'
 import net from 'node:net'
 import { createProxyMiddleware } from 'http-proxy-middleware'

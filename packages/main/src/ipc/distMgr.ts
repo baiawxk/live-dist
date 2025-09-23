@@ -1,6 +1,5 @@
-import Store from 'electron-store'
 import { dialog } from 'electron'
-import type { API } from './apiTypes.js'
+import Store from 'electron-store'
 
 export interface ProxyConfig {
   path: string
@@ -22,7 +21,7 @@ export interface DistConfig {
 
 const store = new Store<{ dists: DistConfig[] }>({
   name: 'dist-configs',
-  defaults: { dists: [] }
+  defaults: { dists: [] },
 })
 
 // 获取所有 dist 配置

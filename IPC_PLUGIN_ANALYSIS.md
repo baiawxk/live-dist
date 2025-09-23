@@ -1,4 +1,4 @@
-# vite-plugin-electron-ipc 插件分析报告
+# vite-plugin-electron-ipc 现有设计
 
 ## 插件用途和功能
 
@@ -42,26 +42,118 @@
 2. **类型安全性**：提供完整的类型提示和检查
 3. **代码组织优化**：按功能模块分文件管理 IPC 函数
 
+---
 
-下一步处理
+# 插件设计重构
 
-1. 确保ipc-types.d 文件结尾多到处虚拟模块的类型
+## 主进程设计
 
-// 按文件名分组的API对象类型定义
-export const app: {
-   //实际内容。。。
+1. 前提 main 进程的ipc函数都放在src/main/ipc ，有2个文件，例如，test1.ts 和 test2.ts
+test1.ts 有两个方法 abc 和 bcd
+test2.ts 有一个方法 efg
+
+2. 主进程配置vite 插件  
+
+viteElectronIPC({
+   scanDir: ['src/main/ipc'], // 多个，使用fast-glob 进行扫描
+   apiName: 'electronAPI',
+   channelCallback: (fileName，methodName) => `${fileName}:${methodName}`, // 可选
+})
+
+3. vite 启动的时候，以上viteElectronIPC 会扫描src/main/ipc 目录下的ts 文件，生成一个虚拟模块 virtual:ipc-main
+   eg.
+
+```ts
+
+import { abc } from 'E:/workspaces/live-dist/packages/src/main/ipc/test1.ts';
+import { bcd } from 'E:/workspaces/live-dist/packages/src/main/ipc/test1.ts';
+import { efg } from 'E:/workspaces/live-dist/packages/src/main/ipc/test2.ts';
+import { ipcMain } from 'electron';
+
+export function registerIPCFunctions() {
+  ipcMain.handle('test1:abc', (_, ...args) => abc(...args));
+  ipcMain.handle('test1:bcd', (_, ...args) => bcd(...args));
+  ipcMain.handle('test2:efg', (_, ...args) => efg(...args));
 }
+```
 
-export const distMgr: {
-  //实际内容。。。
+4. 主进程会使用这个虚拟模块进行ipc 注册
+
+```ts
+import { app, BrowserWindow } from 'electron';
+import { registerIPCFunctions } from 'virtual:ipc-main'; 
+
+app.whenReady().then(() => {
+  const mainWindow = new BrowserWindow({
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+    },
+  });
+
+  registerIPCFunctions(); // 注册所有的ipc 函数
+
+  mainWindow.loadURL('http://localhost:3000');
+});
+```
+
+5. 同时生成另外一个虚拟模块 virtual:ipc-preload 到时候打包暴露出去，preload 进程使用该方法进行ipcRenderer 注册调用
+
+```ts
+import { ipcRenderer, contextBridge } from 'electron'
+
+// 按文件名分组的API对象
+export const electronAPI = {
+  test1: {
+    abc: (...args: any[]) => ipcRenderer.invoke('test1:abc', ...args),
+    bcd: (...args: any[]) => ipcRenderer.invoke('test1:bcd', ...args),
+  },
+  test2: {
+    efg: (...args: any[]) => ipcRenderer.invoke('test2:efg', ...args),
+  },
+};
+
+export function exposeIPCFunctions() {
+  contextBridge.exposeInMainWorld('electronAPI', electronAPI);
 }
+```
 
-export const server: {
-//实际内容。。。
+6. preload 进程使用该虚拟模块
+
+```ts
+import { exposeIPCFunctions } from '@app/ipc-preload'; // 此处是主进程打包后暴露的模块？实际是我们实现的是虚拟模块：virtual:ipc-preload 如何直接打包暴露？是否不需要主进程显示import 然后export ？ 待调研
+
+exposeIPCFunctions(); // 此处假设可以直接使用主进程暴露的模块
+```
+
+7. 生成一个类型声明给 renderer 进程使用
+
+```ts
+// ipc-types.d.ts
+export interface ElectronAPI {  // ElectronAPI from vite options apiName
+  test1: {
+    abc: typeof import('E:/workspaces/live-dist/packages/src/main/ipc/test1.ts').abc;
+    bcd: typeof import('E:/workspaces/live-dist/packages/src/main/ipc/test1.ts').bcd;
+  };     
+  test2: {
+    efg: typeof import('E:/workspaces/live-dist/packages/src/main/ipc/test2.ts').efg;
+  };
+}  
+
+declare global {
+  interface Window {
+    ElectronAPI: ElectronAPI;  // ElectronAPI from vite options apiName
+  }
 }
+```
 
-//以上是例子，以下的虚拟模块是要插件到处的，而且export 的内容要和上面定义的类型对应
 
-declare module 'virtual:ipc-preload' {
-  export { app, distMgr, server }
-}
+8. renderer 进程使用
+
+```ts
+// renderer.ts
+window.ElectronAPI.test1.abc(arg1, arg2).then(result => {
+  console.log(result);
+});
+window.ElectronAPI.test2.efg(arg1).then(result => {
+  console.log(result);
+});

@@ -7,8 +7,8 @@ import { allowExternalUrls } from './modules/ExternalUrls.js'
 import { hardwareAccelerationMode } from './modules/HardwareAccelerationModule.js'
 import { createIPCHandlerModule } from './modules/IPCHandlerModule.js'
 import { disallowMultipleAppInstance } from './modules/SingleInstanceApp.js'
-import { createWindowManagerModule } from './modules/WindowManager.js'
 import { createTrayIconModule } from './modules/TrayIconModule.js'
+import { createWindowManagerModule } from './modules/WindowManager.js'
 
 export async function initApp(initConfig: AppInitConfig) {
   const moduleRunner = createModuleRunner()

@@ -1,6 +1,6 @@
 import type { AppModule } from '../AppModule.js'
 import type { ModuleContext } from '../ModuleContext.js'
-import { registerIPCFunctions } from 'virtual:ipc-main'
+import { registerIPCFunctions } from '../generated/ipc-registry.js'
 
 export function createIPCHandlerModule(): AppModule {
   return {
