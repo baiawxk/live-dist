@@ -1,1 +1,1 @@
-export { apiClient, distMgr } from 'virtual:ipc-preload'
+export * from 'virtual:ipc-preload'

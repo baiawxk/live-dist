@@ -1,6 +1,6 @@
 import { getChromeMajorVersion } from '@app/electron-versions'
-import { resolveModuleExportNames } from 'mlly'
 import electronIPCPlugin from '@app/vite-plugin-electron-ipc'
+import { resolveModuleExportNames } from 'mlly'
 
 export default /**
                 * @type {import('vite').UserConfig}
@@ -29,16 +29,16 @@ export default /**
     reportCompressedSize: false,
   },
   plugins: [
-    mockExposed(), 
-    handleHotReload(), 
+    mockExposed(),
+    handleHotReload(),
     electronIPCPlugin({
       // 扫描API函数的目录路径
-      scanDir: '/Users/chenhongqiang/workspace/live-dist/packages/main/src/ipc',
+      scanDir: '../main/src/ipc',
       // 排除不需要注册为IPC的函数
       excludeFunctions: [],
       // 类型定义文件输出路径
-      typeDefinitionFile: '/Users/chenhongqiang/workspace/live-dist/packages/preload/src/ipc-types.d.ts'
-    })
+      typeDefinitionFile: './src/ipc-types.d.ts',
+    }),
   ],
 })
 
