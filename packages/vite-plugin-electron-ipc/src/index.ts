@@ -378,6 +378,8 @@ ${fileGroups}
       })
 
       s.append(`
+        
+import { ipcRenderer } from 'electron/renderer';
 
 // 按文件名分组的API对象类型定义
 ${Object.keys(groupedFunctions).map((name) => {
