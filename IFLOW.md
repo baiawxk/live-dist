@@ -1,14 +1,15 @@
 # 项目概述
 
-这是一个基于 Vite 和 Electron 的安全 Electron 应用程序模板，专门用于管理多个静态文件目录并为它们提供本地服务器功能。它遵循最新的安全要求、建议和最佳实践，采用 monorepo 结构，每个应用程序部分都是一个独立的包。
+这是一个基于 Vite 和 Electron 的安全 Electron 应用程序，专门用于管理多个静态文件目录并为它们提供本地服务器功能。它遵循最新的安全要求、建议和最佳实践，采用 monorepo 结构，每个应用程序部分都是一个独立的包。
 
 主要技术栈：
-- **Electron**: 用于构建跨平台桌面应用
-- **Vite**: 用于快速构建和开发
-- **Vue.js**: 作为前端框架（renderer 包中使用）
+- **Electron 38**: 用于构建跨平台桌面应用
+- **Vite 7**: 用于快速构建和开发
+- **Vue.js 3**: 作为前端框架（renderer 包中使用）
 - **Element Plus**: 用于 UI 组件
-- **TypeScript**: 用于类型安全
+- **TypeScript 5**: 用于类型安全
 - **Playwright**: 用于端到端测试
+- **Zod**: 用于 IPC 通信的数据验证
 
 ## 项目功能
 
@@ -18,6 +19,7 @@
 3. 配置代理规则以处理 API 请求
 4. 在浏览器中打开目录对应的本地服务器地址
 5. 批量启动或停止所有服务
+6. 实时查看服务状态和管理
 
 ## 项目结构
 
@@ -31,12 +33,20 @@ packages/
 └── integrate-renderer/ # 渲染器集成工具
 ```
 
-### 核心模块
+### 包详细说明
 
-- **DistManager**: 管理目录配置，使用 electron-store 存储数据
-- **LiveServerManager**: 管理本地服务器实例，基于 live-server
-- **IPCHandler**: 处理主进程和渲染进程之间的通信
-- **WindowManager**: 管理应用程序窗口
+- **api**: 定义 IPC 通信的 API 接口和数据结构，使用 Zod 进行类型安全验证
+- **main**: Electron 主进程，包含应用核心逻辑如目录管理、服务器管理、IPC 处理等
+- **preload**: Electron 预加载脚本，安全地暴露 API 给渲染进程
+- **renderer**: Vue.js 应用程序界面，使用 Element Plus 构建
+- **electron-versions**: 管理 Electron 版本相关的工具
+- **integrate-renderer**: 渲染器集成工具，用于初始化和集成渲染器
+
+## 核心模块
+
+- **DistManager**: 管理目录配置，使用 electron-store 存储数据，支持添加、编辑、删除目录配置，以及配置代理规则
+- **LiveServerManager**: 管理本地服务器实例，基于 live-server，支持启动和停止服务器，自动处理端口冲突和强制关闭
+- **AutoIPCHandler**: 基于 Zod 的类型安全 IPC 通信机制，处理主进程和渲染进程之间的通信
 
 ## 构建和运行
 
@@ -83,31 +93,55 @@ pnpm init
 3. **TypeScript**: 全项目使用 TypeScript 进行类型检查。
 4. **Monorepo**: 使用 pnpm workspaces 管理多个包。
 5. **环境变量**: 使用 `import.meta.env` 访问环境变量，只有以 `VITE_` 为前缀的变量才会暴露给客户端代码。
+6. **API 设计**: 使用 Zod 进行严格的类型验证，确保 IPC 通信的安全性和可靠性。
+7. **IPC 通信**: 采用基于 Zod 的类型安全 IPC 通信机制，确保主进程和渲染进程之间的通信安全可靠。
 
 ## 核心功能实现
 
-### 目录管理
-通过 `DistManager` 类管理目录配置，支持：
+### 目录管理 (DistManager)
+通过 `DistManager` 类管理目录配置，使用 electron-store 持久化存储数据，支持：
 - 添加、编辑、删除目录配置
 - 启动和停止目录对应的本地服务器
 - 配置代理规则
+- 自动生成唯一 ID 和时间戳
+- 实时更新目录状态
 
-### 服务器管理
+### 服务器管理 (LiveServerManager)
 通过 `LiveServerManager` 类管理本地服务器实例：
 - 为每个目录启动独立的 live-server 实例
 - 支持自定义端口和代理配置
 - 提供启动和停止服务器的功能
+- 自动处理端口冲突和强制关闭
+- 优雅关闭所有服务器实例
+- 实时监控服务器状态
 
-### 进程间通信
-通过 `IPCHandler` 类处理主进程和渲染进程之间的通信：
+### 进程间通信 (IPC)
+通过基于 Zod 的类型安全 IPC 通信机制：
 - 暴露目录管理相关的 API 给渲染进程
 - 处理文件选择对话框
 - 在浏览器中打开指定 URL
 - 使用 Zod 进行数据验证确保 IPC 通信安全
+- 自动处理错误和日志记录
+- 支持异步通信和错误处理
 
-### 用户界面
-使用 Vue.js 和 Element Plus 构建的现代化界面：
+### 用户界面 (Renderer)
+使用 Vue.js 3 和 Element Plus 构建的现代化界面：
 - 目录列表展示和管理
 - 添加/编辑目录的表单对话框
 - 服务器状态显示和控制
-- 批量操作按钮
+- 批量操作按钮（一键启动/停止所有服务）
+- 实时加载状态反馈
+- 代理规则配置界面
+- 确认删除对话框
+
+### API 架构
+项目采用分层 API 架构确保类型安全和可维护性：
+- **API 定义层**: 在 `@app/api` 包中定义所有 IPC 接口和数据结构，使用 Zod 进行类型安全验证
+- **主进程实现层**: 在 `@app/main` 包中实现 API 的具体业务逻辑
+- **预加载暴露层**: 在 `@app/preload` 包中安全地将 API 暴露给渲染进程
+- **渲染器调用层**: 在 `@app/renderer` 包中调用暴露的 API
+
+#### API 模块
+- **distMgr**: 目录管理相关 API，包括获取、添加、更新、删除目录配置以及选择目录
+- **liveServer**: 服务器管理相关 API，包括启动和停止服务器
+- **shell**: 系统 shell 相关 API，包括在浏览器中打开 URL

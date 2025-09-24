@@ -12,6 +12,7 @@
     }
   },
   "scripts": {
+    "dev": "vite build --watch",
     "build": "vite build",
     "typecheck": "tsc --noEmit"
   },
