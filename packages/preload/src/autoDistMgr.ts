@@ -1,43 +1,14 @@
+import { createModuleClientImplementation, distApi, serverApi, shellApi } from '@app/api'
 import { ipcRenderer } from 'electron'
 
-// 自动创建 IPC 调用方法
-function createIPCMethod(methodName: string) {
-  return async (...args: any[]) => {
-    return await ipcRenderer.invoke(methodName, ...args)
-  }
-}
+// 创建模块化客户端实现
+const createClient = createModuleClientImplementation
 
 // Dist管理相关IPC客户端
-export const distMgr = {
-  // 获取所有目录配置
-  getAllDists: createIPCMethod('dist:getAllDists'),
-
-  // 添加新的目录配置
-  addDist: createIPCMethod('dist:addDist'),
-
-  // 更新目录配置
-  updateDist: createIPCMethod('dist:updateDist'),
-
-  // 删除目录配置
-  removeDist: createIPCMethod('dist:removeDist'),
-
-  // 选择目录
-  selectDirectory: createIPCMethod('dist:selectDirectory'),
-}
+export const distMgr = createClient(distApi, ipcRenderer)
 
 // 服务器管理相关IPC客户端
-export const serverMgr = {
-  // 启动服务器
-  startServer: createIPCMethod('server:startServer'),
-
-  // 停止服务器
-  stopServer: createIPCMethod('server:stopServer'),
-}
+export const serverMgr = createClient(serverApi, ipcRenderer)
 
 // Shell相关IPC客户端
-export const shell = {
-  // 在浏览器中打开
-  openInBrowser: (url: string) => {
-    ipcRenderer.invoke('shell:openInBrowser', url)
-  },
-}
+export const shell = createClient(shellApi, ipcRenderer)

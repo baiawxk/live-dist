@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@app/api": "workspace:*",
     "@app/preload": "workspace:*",
     "@app/renderer": "workspace:*",
     "electron-store": "^10.1.0",

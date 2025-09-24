@@ -5,8 +5,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "paths": {
-      "@app/preload": ["../preload"],
-      "@app/renderer": ["../renderer"]
+      "@app/*": ["../*"]
     },
     "types": ["node"],
     "strict": true,
