@@ -13,7 +13,7 @@
   "workspaces": [
     "packages/*"
   ],
-  "main": "packages/main/dist/index.js",
+  "main": "packages/entry-point.mjs",
   "engines": {
     "node": ">=22.0.0"
   },

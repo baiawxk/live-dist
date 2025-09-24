@@ -22,7 +22,7 @@ process.env.MODE = mode
  */
 const rendererWatchServer = await createServer({
   mode,
-  root: path.resolve('packages/renderer'),
+  root: path.resolve(import.meta.dirname, 'renderer'),
 })
 
 await rendererWatchServer.listen()
@@ -48,14 +48,14 @@ const rendererWatchServerProvider = {
 
 /** @type {string[]} */
 const packagesToStart = [
-  'packages/preload',
-  'packages/main',
+  'preload',
+  'main',
 ]
 
 for (const pkg of packagesToStart) {
   await build({
     mode,
-    root: path.resolve(pkg),
+    root: path.resolve(import.meta.dirname, pkg),
     plugins: [
       rendererWatchServerProvider,
     ],

@@ -7,9 +7,9 @@
       "default": "./dist/index.js"
     }
   },
-  "main": "./dist/index.js",
+  "main": "../entry-point.mjs",
   "scripts": {
-    "dev": "vite build && nodemon  --watch ../../packages/preload/dist --watch ../../packages/api/dist --exec \"cross-env MODE=development electron .\"",
+    "dev": "node ../dev-mode.js",
     "build": "vite build",
     "typecheck": "tsc --noEmit"
   },
