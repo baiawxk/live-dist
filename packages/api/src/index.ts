@@ -1,5 +1,3 @@
-export { createIPCInvoker } from './createIpcClient.js'
-export { setupIPCHandler } from './createIpcHandler.js'
 export * from './modules/dist.js'
 export * from './modules/server.js'
 export * from './modules/shell.js'

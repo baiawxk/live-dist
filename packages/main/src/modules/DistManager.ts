@@ -62,12 +62,12 @@ export class DistManager {
   }
 
   // 更新 dist 配置
-  updateDist(id: string, update: Partial<Omit<DistConfig, 'id' | 'createdAt'>>): DistConfig | null {
+  updateDist(id: string, update: Partial<Omit<DistConfig, 'id' | 'createdAt'>>): DistConfig {
     const dists = this.getAllDists()
     const index = dists.findIndex(dist => dist.id === id)
 
     if (index === -1)
-      return null
+      throw new Error('Dist not found')
 
     const updatedDist: DistConfig = {
       ...dists[index],

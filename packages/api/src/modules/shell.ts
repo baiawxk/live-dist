@@ -1,15 +1,14 @@
 import { z } from 'zod'
+import { createApiSchema } from '../core'
 
-// Shell 模块 API 定义
-export const shellApi = {
-  // 在浏览器中打开
-  openInBrowser: {
-    channel: 'shell:openInBrowser',
-    input: z.promise(z.string()),
-    output: z.promise(z.void()),
+export const shellApi = createApiSchema(
+  {
+    openInBrowser: z.function({
+      input: [z.string()],
+      output: z.void(),
+    }),
   },
-} as const
-
-// 导出类型推导工具
-export type ShellApi = typeof shellApi
-export type OpenInBrowserInput = z.infer<typeof shellApi.openInBrowser.input>
+  {
+    channelPrefix: 'shell',
+  },
+)

@@ -1,4 +1,4 @@
-import { distApi, serverApi, setupIPCHandler, shellApi } from '@app/api'
+import { distApi, serverApi, shellApi } from '@app/api'
 import { dialog, ipcMain, shell } from 'electron'
 import { DistManager } from './DistManager.js'
 import { LiveServerManager } from './LiveServerManager.js'
@@ -6,12 +6,11 @@ import { LiveServerManager } from './LiveServerManager.js'
 const distManager = new DistManager()
 const serverManager = new LiveServerManager()
 
-// 实现业务逻辑
-const distImplementations = {
+const setupDistHandler = distApi.createIpcSetupFn({
   getAllDists: async () => {
     return distManager.getAllDists()
   },
-  addDist: async (config: any) => {
+  addDist: async (config) => {
     const distManager = new DistManager()
     try {
       const result = distManager.addDist(config)
@@ -23,10 +22,10 @@ const distImplementations = {
       throw error
     }
   },
-  updateDist: async (config: any) => {
+  updateDist: async (config) => {
     return distManager.updateDist(config.id, config)
   },
-  removeDist: async (id: string) => {
+  removeDist: async (id) => {
     return distManager.removeDist(id)
   },
   selectDirectory: async () => {
@@ -35,10 +34,10 @@ const distImplementations = {
     })
     return result.canceled ? null : result.filePaths[0]
   },
-}
+})
 
-const serverImplementations = {
-  startServer: async (id: string) => {
+const setupServer = serverApi.createIpcSetupFn({
+  startServer: async (id) => {
     console.log('Attempting to start server for ID:', id)
 
     const dist = distManager.getDist(id)
@@ -58,7 +57,7 @@ const serverImplementations = {
     }
     return success
   },
-  stopServer: async (id: string) => {
+  stopServer: async (id) => {
     console.log('Attempting to stop server for ID:', id)
 
     const isRunning = serverManager.getServerStatus(id)
@@ -79,19 +78,19 @@ const serverImplementations = {
     }
     return success
   },
-}
+})
 
-const shellImplementations = {
-  openInBrowser: async (url: string) => {
+const setupShell = shellApi.createIpcSetupFn({
+  openInBrowser: async (url) => {
     shell.openExternal(url)
   },
-}
+})
 
 // 设置 IPC 处理器
 export function setupAutoIPCHandler() {
-  setupIPCHandler(distApi, distImplementations, ipcMain)
-  setupIPCHandler(serverApi, serverImplementations, ipcMain)
-  setupIPCHandler(shellApi, shellImplementations, ipcMain)
+  setupDistHandler(ipcMain)
+  setupServer(ipcMain)
+  setupShell(ipcMain)
 }
 
 // 当应用程序退出时清理资源
