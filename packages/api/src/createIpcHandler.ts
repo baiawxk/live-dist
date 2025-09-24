@@ -25,7 +25,7 @@ export function createModuleHandler<ApiDef extends Record<string, any>>(
     const implementation = implementations[methodName]
     if (implementation) {
       // 这里我们不实际调用 createIpcHandler，因为这只是一个示例
-      // 在实际使用中，createModuleHandlerImplementation 会处理这个
+      // 在实际使用中，setupIPCHandler 会处理这个
       // 使用变量以避免未使用警告
       void methodName
       void methodDef
@@ -62,7 +62,7 @@ export function createIpcHandlerImplementation(ipcMain: any) {
 }
 
 // 模块化处理器实现 - 供 main 层使用
-export function createModuleHandlerImplementation<ApiDef extends Record<string, any>>(
+export function setupIPCHandler<ApiDef extends Record<string, any>>(
   apiDef: ApiDef,
   implementations: {
     [K in keyof ApiDef]: (args?: z.infer<ApiDef[K]['input']>) => Promise<z.infer<ApiDef[K]['output']>>

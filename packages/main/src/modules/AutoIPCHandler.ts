@@ -1,4 +1,4 @@
-import { createModuleHandlerImplementation, distApi, serverApi, shellApi } from '@app/api'
+import { distApi, serverApi, setupIPCHandler, shellApi } from '@app/api'
 import { dialog, ipcMain, shell } from 'electron'
 import { DistManager } from './DistManager.js'
 import { LiveServerManager } from './LiveServerManager.js'
@@ -89,9 +89,9 @@ const shellImplementations = {
 
 // 设置 IPC 处理器
 export function setupAutoIPCHandler() {
-  createModuleHandlerImplementation(distApi, distImplementations, ipcMain)
-  createModuleHandlerImplementation(serverApi, serverImplementations, ipcMain)
-  createModuleHandlerImplementation(shellApi, shellImplementations, ipcMain)
+  setupIPCHandler(distApi, distImplementations, ipcMain)
+  setupIPCHandler(serverApi, serverImplementations, ipcMain)
+  setupIPCHandler(shellApi, shellImplementations, ipcMain)
 }
 
 // 当应用程序退出时清理资源

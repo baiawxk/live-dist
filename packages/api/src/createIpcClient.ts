@@ -63,7 +63,7 @@ export function createIpcClientImplementation() {
 }
 
 // 模块化客户端实现 - 供 preload 层使用
-export function createModuleClientImplementation<ApiDef extends Record<string, any>>(
+export function createIPCInvoker<ApiDef extends Record<string, any>>(
   apiDef: ApiDef,
   ipcRenderer: any,
 ) {
