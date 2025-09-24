@@ -6,7 +6,7 @@ import { LiveServerManager } from './LiveServerManager.js'
 const distManager = new DistManager()
 const serverManager = new LiveServerManager()
 
-const setupDistHandler = distApi.createIpcSetupFn({
+const setupDistMgr = distApi.createIpcSetupFn({
   getAllDists: async () => {
     return await distManager.getAllDists()
   },
@@ -88,7 +88,7 @@ const setupShell = shellApi.createIpcSetupFn({
 
 // 设置 IPC 处理器
 export function setupAutoIPCHandler() {
-  setupDistHandler(ipcMain)
+  setupDistMgr(ipcMain)
   setupServer(ipcMain)
   setupShell(ipcMain)
 }
