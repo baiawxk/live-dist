@@ -8,12 +8,12 @@ const serverManager = new LiveServerManager()
 
 const setupDistHandler = distApi.createIpcSetupFn({
   getAllDists: async () => {
-    return distManager.getAllDists()
+    return await distManager.getAllDists()
   },
   addDist: async (config) => {
     const distManager = new DistManager()
     try {
-      const result = distManager.addDist(config)
+      const result = await distManager.addDist(config)
       console.log('addDist result in main:', result)
       return result
     }
@@ -23,10 +23,10 @@ const setupDistHandler = distApi.createIpcSetupFn({
     }
   },
   updateDist: async (config) => {
-    return distManager.updateDist(config.id, config)
+    return await distManager.updateDist(config.id, config)
   },
   removeDist: async (id) => {
-    return distManager.removeDist(id)
+    return await distManager.removeDist(id)
   },
   selectDirectory: async () => {
     const result = await dialog.showOpenDialog({
@@ -40,7 +40,7 @@ const setupServer = serverApi.createIpcSetupFn({
   startServer: async (id) => {
     console.log('Attempting to start server for ID:', id)
 
-    const dist = distManager.getDist(id)
+    const dist = await distManager.getDist(id)
     if (!dist) {
       console.log('No dist config found for ID:', id)
       return false
@@ -50,7 +50,7 @@ const setupServer = serverApi.createIpcSetupFn({
     const success = await serverManager.startServer(dist)
     if (success) {
       console.log('Server started successfully, updating status')
-      distManager.updateDistStatus(id, true)
+      await distManager.updateDistStatus(id, true)
     }
     else {
       console.log('Server failed to start')
@@ -63,7 +63,7 @@ const setupServer = serverApi.createIpcSetupFn({
     const isRunning = serverManager.getServerStatus(id)
     if (!isRunning) {
       console.log('Server was not running, updating status only')
-      distManager.updateDistStatus(id, false)
+      await distManager.updateDistStatus(id, false)
       return true
     }
 
@@ -71,7 +71,7 @@ const setupServer = serverApi.createIpcSetupFn({
     const success = await serverManager.stopServer(id)
     if (success) {
       console.log('Server stopped successfully, updating status')
-      distManager.updateDistStatus(id, false)
+      await distManager.updateDistStatus(id, false)
     }
     else {
       console.log('Failed to stop server')
@@ -82,7 +82,7 @@ const setupServer = serverApi.createIpcSetupFn({
 
 const setupShell = shellApi.createIpcSetupFn({
   openInBrowser: async (url) => {
-    shell.openExternal(url)
+    await shell.openExternal(url)
   },
 })
 
