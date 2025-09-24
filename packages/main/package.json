@@ -30,6 +30,6 @@
     "electron-devtools-installer": "4.0.0",
     "nodemon": "^3.1.10",
     "typescript": "5.9.2",
-    "vite": "7.1.6"
+    "vite": "7.1.7"
   }
 }
