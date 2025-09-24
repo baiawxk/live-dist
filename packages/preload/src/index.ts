@@ -1,3 +1,3 @@
-import { distMgr, serverMgr, shell, getAllDists, addDist, updateDist, removeDist, selectDirectory, startServer, stopServer, openInBrowser } from './autoDistMgr.js'
+import { distMgr, serverMgr, shell } from './autoDistMgr.js'
 
-export { distMgr, serverMgr, shell, getAllDists, addDist, updateDist, removeDist, selectDirectory, startServer, stopServer, openInBrowser }
+export { distMgr, serverMgr, shell }
