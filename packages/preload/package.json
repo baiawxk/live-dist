@@ -15,10 +15,12 @@
     "build": "vite build",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@app/api": "workspace:*"
+  },
   "devDependencies": {
     "@app/electron-versions": "workspace:*",
     "mlly": "1.8.0",
-    "typescript": "5.9.2",
     "vite": "7.1.6"
   }
 }

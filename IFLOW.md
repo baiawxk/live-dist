@@ -23,6 +23,7 @@
 
 ```
 packages/
+├── api/                # IPC 通信层，使用 Zod 进行数据验证
 ├── main/               # Electron 主进程逻辑
 ├── preload/            # Electron 预加载脚本
 ├── renderer/           # 应用程序界面（Vue.js）
@@ -41,37 +42,37 @@ packages/
 
 ### 开发模式
 ```bash
-npm start
+pnpm start
 ```
 启动开发模式的应用程序，带有热重载功能。
 
 ### 构建项目
 ```bash
-npm run build
+pnpm build
 ```
 在所有工作区中运行构建命令。
 
 ### 编译可执行文件
 ```bash
-npm run compile
+pnpm compile
 ```
 首先运行构建脚本，然后使用 `electron-builder` 将项目编译成可执行文件。
 
 ### 运行测试
 ```bash
-npm run test
+pnpm test
 ```
 使用 Playwright 在编译后的应用程序上执行端到端测试。
 
 ### 类型检查
 ```bash
-npm run typecheck
+pnpm typecheck
 ```
 在所有工作区中运行类型检查命令。
 
 ### 初始化环境
 ```bash
-npm run init
+pnpm init
 ```
 通过创建新的渲染器、集成它并安装必要的包来设置初始环境。
 
@@ -80,7 +81,7 @@ npm run init
 1. **模块化架构**: 应用程序采用模块化设计，每个功能都是一个独立的模块。
 2. **安全性**: 遵循 Electron 安全指南，使用上下文隔离和预加载脚本。
 3. **TypeScript**: 全项目使用 TypeScript 进行类型检查。
-4. **Monorepo**: 使用 npm workspaces 管理多个包。
+4. **Monorepo**: 使用 pnpm workspaces 管理多个包。
 5. **环境变量**: 使用 `import.meta.env` 访问环境变量，只有以 `VITE_` 为前缀的变量才会暴露给客户端代码。
 
 ## 核心功能实现
@@ -102,6 +103,7 @@ npm run init
 - 暴露目录管理相关的 API 给渲染进程
 - 处理文件选择对话框
 - 在浏览器中打开指定 URL
+- 使用 Zod 进行数据验证确保 IPC 通信安全
 
 ### 用户界面
 使用 Vue.js 和 Element Plus 构建的现代化界面：

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormInstance, FormRules } from 'element-plus'
-import { distMgr } from '@app/preload'
+import { distMgr, serverMgr, shell } from '@app/preload'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { onMounted, ref } from 'vue'
 
@@ -78,7 +78,7 @@ async function startAllServers() {
     // 依次启动每个服务
     for (const dist of notRunningServers) {
       try {
-        await distMgr.startServer(dist.id)
+        await serverMgr.startServer(dist.id)
         successCount++
       }
       catch (error) {
@@ -129,7 +129,7 @@ async function stopAllServers() {
     // 依次停止每个服务
     for (const dist of runningServers) {
       try {
-        await distMgr.stopServer(dist.id)
+        await serverMgr.stopServer(dist.id)
         successCount++
       }
       catch (error) {
@@ -289,13 +289,13 @@ async function toggleServer(dist: DistConfig) {
     loadingStates.value[serverId] = true
 
     if (dist.isActive) {
-      await distMgr.stopServer(serverId)
-      ElMessage.success('服务已停止')
-    }
-    else {
-      await distMgr.startServer(serverId)
-      ElMessage.success('服务已启动')
-    }
+        await serverMgr.stopServer(serverId)
+        ElMessage.success('服务已停止')
+      }
+      else {
+        await serverMgr.startServer(serverId)
+        ElMessage.success('服务已启动')
+      }
 
     await loadDistList()
   }
@@ -312,7 +312,7 @@ async function toggleServer(dist: DistConfig) {
 }
 
 function openInBrowser(dist: DistConfig) {
-  distMgr.openInBrowser(`http://localhost:${dist.port}`)
+  shell.openInBrowser(`http://localhost:${dist.port}`)
 }
 
 function confirmDelete(dist: DistConfig) {
@@ -330,7 +330,7 @@ function confirmDelete(dist: DistConfig) {
   ).then(async () => {
     try {
       if (isActive) {
-        await distMgr.stopServer(serverId)
+        await serverMgr.stopServer(serverId)
       }
       await distMgr.removeDist(serverId)
       ElMessage.success('删除成功')
