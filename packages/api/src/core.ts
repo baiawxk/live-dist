@@ -9,6 +9,7 @@ function setupDefaultHandler(ipcMain: any, channelName: string, handler: (...arg
   ipcMain.handle(channelName, async (event: any, ...args: any[]) => {
     try {
       const result = await handler(...args)
+      console.log(`[Res][${channelName}][${args}][${result}]`)
       return result
     }
     catch (error) {
@@ -39,6 +40,7 @@ export function createApiSchema<T extends Record<string, z.ZodFunction>>(schemas
         const channelName = `${options.channelPrefix}:${key}`
         return [key, async (...args: any[]) => {
           try {
+            console.log(`[Req][${channelName}][${args}]`)
             return await ipcRenderer.invoke(channelName, ...args)
           }
           catch (error) {
