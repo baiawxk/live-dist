@@ -14,6 +14,6 @@ export const serverApi = createApiSchema(
     }),
   },
   {
-    channelPrefix: 'server',
+    channelPrefix: 'liveServer',
   },
 )

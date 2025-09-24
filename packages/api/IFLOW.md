@@ -18,18 +18,17 @@
 
 ```
 src/
-├── createIpcClient.ts      # IPC 客户端创建工具
-├── createIpcHandler.ts     # IPC 处理器创建工具
+├── core.ts                 # IPC 客户端和处理器创建工具
 ├── index.ts                # 模块导出入口
 └── modules/
-    ├── dist.ts             # Dist 模块 API 定义
-    ├── server.ts           # Server 模块 API 定义
+    ├── distMgr.ts          # Dist 模块 API 定义
+    ├── liveServer.ts       # Server 模块 API 定义
     └── shell.ts            # Shell 模块 API 定义
 ```
 
 ### 核心模块
 
-- **Dist 模块**: 定义了目录配置的管理接口，包括获取、添加、更新、删除目录配置以及选择目录的功能。
+- **Dist 模块**: 定义了目录配置的管理接口，包括获取、添加、更新、删除目录配置以及选择目录的功能。支持代理规则配置。
 - **Server 模块**: 定义了本地服务器的控制接口，包括启动和停止服务器的功能。
 - **Shell 模块**: 定义了与操作系统交互的接口，如在浏览器中打开 URL。
 

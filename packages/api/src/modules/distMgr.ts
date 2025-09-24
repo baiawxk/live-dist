@@ -53,6 +53,6 @@ export const distApi = createApiSchema(
     }),
   },
   {
-    channelPrefix: 'dist',
+    channelPrefix: 'distMgr',
   },
 )
