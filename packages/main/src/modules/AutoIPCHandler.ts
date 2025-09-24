@@ -3,10 +3,12 @@ import { dialog, ipcMain, shell } from 'electron'
 import { DistManager } from './DistManager.js'
 import { LiveServerManager } from './LiveServerManager.js'
 
+const distManager = new DistManager()
+const serverManager = new LiveServerManager()
+
 // 实现业务逻辑
 const distImplementations = {
   getAllDists: async () => {
-    const distManager = new DistManager()
     return distManager.getAllDists()
   },
   addDist: async (config: any) => {
@@ -22,11 +24,9 @@ const distImplementations = {
     }
   },
   updateDist: async (config: any) => {
-    const distManager = new DistManager()
     return distManager.updateDist(config.id, config)
   },
   removeDist: async (id: string) => {
-    const distManager = new DistManager()
     return distManager.removeDist(id)
   },
   selectDirectory: async () => {
@@ -40,8 +40,6 @@ const distImplementations = {
 const serverImplementations = {
   startServer: async (id: string) => {
     console.log('Attempting to start server for ID:', id)
-    const distManager = new DistManager()
-    const serverManager = new LiveServerManager()
 
     const dist = distManager.getDist(id)
     if (!dist) {
@@ -62,8 +60,6 @@ const serverImplementations = {
   },
   stopServer: async (id: string) => {
     console.log('Attempting to stop server for ID:', id)
-    const distManager = new DistManager()
-    const serverManager = new LiveServerManager()
 
     const isRunning = serverManager.getServerStatus(id)
     if (!isRunning) {
@@ -100,6 +96,5 @@ export function setupAutoIPCHandler() {
 
 // 当应用程序退出时清理资源
 export async function cleanupAutoIPC() {
-  const serverManager = new LiveServerManager()
   await serverManager.stopAllServers()
 }
