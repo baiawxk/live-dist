@@ -6,7 +6,7 @@ type Implementations<T extends Record<string, z.ZodFunction>> = {
 }
 
 function setupDefaultHandler(ipcMain: any, channelName: string, handler: (...args: any[]) => any) {
-  ipcMain.handle(channelName, async (event: any, ...args: any[]) => {
+  ipcMain.handle(channelName, async (_event: any, ...args: any[]) => {
     try {
       const result = await handler(...args)
       console.log(`[Res][${channelName}][${args}][${result}]`)

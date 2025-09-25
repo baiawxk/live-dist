@@ -32,7 +32,7 @@ const setupDistMgr = distApi.createIpcSetupFn({
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory'],
     })
-    return result.canceled ? null : result.filePaths[0]
+    return result.canceled || !result.filePaths[0] ? null : result.filePaths[0]
   },
 })
 
