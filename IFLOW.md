@@ -145,3 +145,17 @@ pnpm init
 - **distMgr**: 目录管理相关 API，包括获取、添加、更新、删除目录配置以及选择目录
 - **liveServer**: 服务器管理相关 API，包括启动和停止服务器
 - **shell**: 系统 shell 相关 API，包括在浏览器中打开 URL
+
+
+## 代办事项
+
+- [ ] 使用插件 [vite-plugin-electron](https://github.com/electron-vite/vite-plugin-electron) 去处理热更新，共享环境变量
+- [ ] 丰富Vite插件,AutoImport...
+- [ ] 更新Readme.md
+- [ ] app/api > ipc
+- [ ] enhance zod & v4
+- [ ] use vite rolldown
+- [ ] strong ts
+- [ ] refine ci
+
+
