@@ -3,13 +3,14 @@
 这是一个基于 Vite 和 Electron 的安全 Electron 应用程序，专门用于管理多个静态文件目录并为它们提供本地服务器功能。它遵循最新的安全要求、建议和最佳实践，采用 monorepo 结构，每个应用程序部分都是一个独立的包。
 
 主要技术栈：
-- **Electron 38**: 用于构建跨平台桌面应用
-- **Vite 7**: 用于快速构建和开发
+- **Electron**: 用于构建跨平台桌面应用
+- **Vite**: 用于快速构建和开发
 - **Vue.js 3**: 作为前端框架（renderer 包中使用）
 - **Element Plus**: 用于 UI 组件
-- **TypeScript 5**: 用于类型安全
+- **TypeScript**: 用于类型安全
 - **Playwright**: 用于端到端测试
 - **Zod**: 用于 IPC 通信的数据验证
+- **Vitest**: 用于单元测试
 
 ## 项目功能
 
@@ -69,10 +70,18 @@ pnpm compile
 首先运行构建脚本，然后使用 `electron-builder` 将项目编译成可执行文件。
 
 ### 运行测试
+
+#### 端到端测试
+```bash
+pnpm test:e2e
+```
+使用 Playwright 在编译后的应用程序上执行端到端测试。
+
+#### 单元测试
 ```bash
 pnpm test
 ```
-使用 Playwright 在编译后的应用程序上执行端到端测试。
+使用 Vitest 运行单元测试。
 
 ### 类型检查
 ```bash
@@ -95,6 +104,7 @@ pnpm init
 5. **环境变量**: 使用 `import.meta.env` 访问环境变量，只有以 `VITE_` 为前缀的变量才会暴露给客户端代码。
 6. **API 设计**: 使用 Zod 进行严格的类型验证，确保 IPC 通信的安全性和可靠性。
 7. **IPC 通信**: 采用基于 Zod 的类型安全 IPC 通信机制，确保主进程和渲染进程之间的通信安全可靠。
+8. **测试**: 使用 Vitest 进行单元测试，为每个包提供独立的测试环境。
 
 ## 核心功能实现
 
@@ -146,6 +156,21 @@ pnpm init
 - **liveServer**: 服务器管理相关 API，包括启动和停止服务器
 - **shell**: 系统 shell 相关 API，包括在浏览器中打开 URL
 
+## 测试架构
+
+项目支持多种测试类型：
+
+### 单元测试
+使用 Vitest 作为测试框架，支持不同运行时环境：
+- API 包：Node.js 运行时
+- Main 包：Node.js 运行时
+- Preload 包：Node.js 运行时
+- Renderer 包：JSDOM 运行时
+
+每个包的测试文件位于 `__tests__` 目录中，与 `src` 目录同级。
+
+### 端到端测试
+使用 Playwright 进行端到端测试，测试文件位于项目根目录的 `tests` 目录中。
 
 ## 代办事项
 
@@ -154,5 +179,3 @@ pnpm init
 - [ ] app/api > ipc
 - [ ] enhance zod & v4
 - [ ] refine ci
-
-
