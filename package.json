@@ -3,7 +3,7 @@
   "type": "module",
   "version": "3.1.0",
   "private": true,
-  "packageManager": "pnpm@10.7.0",
+  "packageManager": "pnpm@10.17.1",
   "description": "Secure boilerplate for Electron app based on Vite",
   "author": {
     "email": "baiawxk@qq.com",
