@@ -6,6 +6,7 @@ export default antfu({
     'unused-imports/no-unused-vars': 'off',
     'node/prefer-global/process': 'off',
     'antfu/no-top-level-await': 'off',
-    'node/handle-callback-err': 'off'
-  }
+    'node/handle-callback-err': 'off',
+  },
+  pnpm: true,
 })

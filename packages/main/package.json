@@ -17,19 +17,19 @@
     "@app/api": "workspace:*",
     "@app/preload": "workspace:*",
     "@app/renderer": "workspace:*",
-    "electron-store": "^10.1.0",
-    "electron-updater": "6.6.2",
-    "http-proxy-middleware": "^3.0.5",
-    "live-server": "^1.2.2"
+    "electron-store": "catalog:",
+    "electron-updater": "catalog:",
+    "http-proxy-middleware": "catalog:",
+    "live-server": "catalog:"
   },
   "devDependencies": {
     "@app/electron-versions": "workspace:*",
-    "@types/http-proxy-middleware": "^1.0.0",
-    "@types/live-server": "^1.2.3",
-    "cross-env": "^10.0.0",
-    "electron-devtools-installer": "4.0.0",
-    "nodemon": "^3.1.10",
-    "typescript": "5.9.2",
-    "vite": "7.1.6"
+    "@types/http-proxy-middleware": "catalog:",
+    "@types/live-server": "catalog:",
+    "cross-env": "catalog:",
+    "electron-devtools-installer": "catalog:",
+    "nodemon": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }

@@ -64,17 +64,21 @@ export class DistManager {
   // 更新 dist 配置
   updateDist(id: string, update: Partial<Omit<DistConfig, 'id' | 'createdAt'>>): DistConfig {
     const dists = this.getAllDists()
-    const index = dists.findIndex(dist => dist.id === id)
+    const existingDist = dists.find(dist => dist.id === id)
 
-    if (index === -1)
+    if (!existingDist)
       throw new Error('Dist not found')
 
     const updatedDist: DistConfig = {
-      ...dists[index],
-      ...update,
+      ...existingDist,
+      ...Object.fromEntries(
+        Object.entries(update).filter(([_, value]) => value !== undefined)
+      ),
+      id: existingDist.id, // 确保 id 不会被更新覆盖
       updatedAt: Date.now(),
     }
 
+    const index = dists.findIndex(dist => dist.id === id);
     dists[index] = updatedDist
     this.store.set('dists', dists)
     return updatedDist
@@ -104,19 +108,21 @@ export class DistManager {
     console.log(`Updating status for ID ${id} to ${isActive}`)
     try {
       const dists = this.getAllDists()
-      const index = dists.findIndex(dist => dist.id === id)
+      const existingDist = dists.find(dist => dist.id === id)
 
-      if (index === -1) {
+      if (!existingDist) {
         console.log(`No dist found with ID ${id}`)
         return false
       }
 
-      const updatedDist = {
-        ...dists[index],
+      const updatedDist: DistConfig = {
+        ...existingDist,
+        id: existingDist.id, // 确保 id 保持不变
         isActive,
         updatedAt: Date.now(),
       }
 
+      const index = dists.findIndex(dist => dist.id === id);
       dists[index] = updatedDist
       this.store.set('dists', dists)
       console.log(`Status updated successfully for ${id}`)
