@@ -5,7 +5,7 @@ catalog:
   '@antfu/eslint-config': ^5.4.1
   '@element-plus/icons-vue': '*'
   '@npmcli/map-workspaces': 5.0.0
-  '@playwright/test': 1.55.0
+  '@playwright/test': 1.55.1
   '@types/http-proxy-middleware': '*'
   '@types/live-server': '*'
   '@types/node': 24.5.2
