@@ -12,7 +12,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build --base ./",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@app/preload": "workspace:*",
