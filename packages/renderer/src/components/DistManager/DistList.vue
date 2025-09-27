@@ -2,11 +2,13 @@
 import type { DistConfig } from '@/types/dist'
 import { useDistManager } from '@/composables/useDistManager'
 import { ElMessageBox } from 'element-plus'
+import { onMounted } from 'vue'
 
 const {
   distList,
   loadingStates,
   batchLoading,
+  loadDistList,
   startAllServers,
   stopAllServers,
   toggleServer,
@@ -18,6 +20,11 @@ const emit = defineEmits<{
   (e: 'edit', dist: DistConfig): void
   (e: 'add'): void
 }>()
+
+// 确保组件挂载时加载列表
+onMounted(async () => {
+  await loadDistList()
+})
 
 function confirmDelete(dist: DistConfig) {
   ElMessageBox.confirm(

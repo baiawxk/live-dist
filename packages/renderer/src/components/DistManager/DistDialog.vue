@@ -7,7 +7,6 @@ const props = defineProps<{
   visible: boolean
   isEditing: boolean
   initialData: DistConfig | null
-  loadDistList: () => Promise<void>
 }>()
 
 const emit = defineEmits<{
@@ -22,7 +21,7 @@ const {
   addProxyRule,
   removeProxyRule,
   saveDistConfig,
-} = useDistForm(props.loadDistList)
+} = useDistForm()
 
 // 监听 visible 变化
 const visibleModel = computed({

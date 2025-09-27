@@ -3,17 +3,23 @@ import { distMgr, serverMgr, shell } from '@app/preload'
 import { ElMessage } from 'element-plus'
 import { ref, onMounted } from 'vue'
 
-export function useDistManager() {
-  // 状态
-  const distList = ref<DistConfig[]>([])
-  const loadingStates = ref<{ [key: string]: boolean }>({})
-  const batchLoading = ref<'start' | 'stop' | false>(false)
+// 创建共享的状态
+const distList = ref<DistConfig[]>([])
+const loadingStates = ref<{ [key: string]: boolean }>({})
+const batchLoading = ref<'start' | 'stop' | false>(false)
 
+// 是否已经挂载
+let isMounted = false
+
+export function useDistManager() {
   // 生命周期
   onMounted(async () => {
-    await loadDistList()
-    // 初始化时清除所有加载状态
-    loadingStates.value = {}
+    if (!isMounted) {
+      await loadDistList()
+      // 初始化时清除所有加载状态
+      loadingStates.value = {}
+      isMounted = true
+    }
   })
 
   // 方法

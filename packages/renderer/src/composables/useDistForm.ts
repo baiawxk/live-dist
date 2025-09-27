@@ -1,11 +1,13 @@
 import type { FormInstance, FormRules } from 'element-plus'
-import type { DistConfig, ProxyRule } from '@/types/dist'
+import type { ProxyRule } from '@/types/dist'
 import { distMgr } from '@app/preload'
 import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
+import { useDistManager } from './useDistManager'
 
-export function useDistForm(loadDistList: () => Promise<void>) {
+export function useDistForm() {
   const formRef = ref<FormInstance>()
+  const { loadDistList } = useDistManager()
 
   // 表单数据
   const form = ref({

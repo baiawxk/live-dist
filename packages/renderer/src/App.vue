@@ -1,13 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import DistList from '@/components/DistManager/DistList.vue'
-import DistDialog from '@/components/DistManager/DistDialog.vue'
-import { useDistManager } from '@/composables'
 import type { DistConfig } from '@/types/dist'
-
-const { 
-  loadDistList,
-} = useDistManager()
+import { ref } from 'vue'
+import DistDialog from '@/components/DistManager/DistDialog.vue'
+import DistList from '@/components/DistManager/DistList.vue'
 
 const dialogVisible = ref(false)
 const isEditing = ref(false)
@@ -21,7 +16,7 @@ function handleAdd() {
 
 function handleEdit(dist: DistConfig) {
   isEditing.value = true
-  currentDist.value = { ...dist }  // 创建副本避免直接修改
+  currentDist.value = { ...dist } // 创建副本避免直接修改
   dialogVisible.value = true
 }
 </script>
@@ -33,17 +28,16 @@ function handleEdit(dist: DistConfig) {
         <h1>Dist Manager</h1>
       </div>
     </el-header>
-    
-    <DistList 
+
+    <DistList
       @add="handleAdd"
       @edit="handleEdit"
     />
-    
+
     <DistDialog
       v-model:visible="dialogVisible"
       v-model:is-editing="isEditing"
       :initial-data="currentDist"
-      :load-dist-list="loadDistList"
     />
   </el-container>
 </template>
