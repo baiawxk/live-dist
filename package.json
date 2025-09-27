@@ -28,7 +28,7 @@
     "typecheck": "turbo run typecheck",
     "lint": "eslint .",
     "lint:ox": "oxlint .",
-    "lint:fix": "eslint . --fix",
+    "lint:fix": "eslint packages/ --fix",
     "lint:ox:fix": "oxlint . --fix",
     "create-renderer": "cd packages && node ./integrate-renderer/create-renderer.js",
     "integrate-renderer": "pnpm --filter @app/integrate-renderer start",

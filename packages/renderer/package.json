@@ -12,7 +12,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build --base ./",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit",
+    "eslint:fix": "eslint --fix src/**/*.{ts,vue}"
   },
   "dependencies": {
     "@app/preload": "workspace:*",

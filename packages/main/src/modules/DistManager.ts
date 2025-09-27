@@ -72,13 +72,13 @@ export class DistManager {
     const updatedDist: DistConfig = {
       ...existingDist,
       ...Object.fromEntries(
-        Object.entries(update).filter(([_, value]) => value !== undefined)
+        Object.entries(update).filter(([_, value]) => value !== undefined),
       ),
       id: existingDist.id, // 确保 id 不会被更新覆盖
       updatedAt: Date.now(),
     }
 
-    const index = dists.findIndex(dist => dist.id === id);
+    const index = dists.findIndex(dist => dist.id === id)
     dists[index] = updatedDist
     this.store.set('dists', dists)
     return updatedDist
@@ -122,7 +122,7 @@ export class DistManager {
         updatedAt: Date.now(),
       }
 
-      const index = dists.findIndex(dist => dist.id === id);
+      const index = dists.findIndex(dist => dist.id === id)
       dists[index] = updatedDist
       this.store.set('dists', dists)
       console.log(`Status updated successfully for ${id}`)

@@ -1,6 +1,6 @@
 import type { AppModule } from '../AppModule.js'
 import type { ModuleContext } from '../ModuleContext.js'
-import { setupAutoIPCHandler, cleanupAutoIPC } from './AutoIPCHandler.js'
+import { cleanupAutoIPC, setupAutoIPCHandler } from './AutoIPCHandler.js'
 
 export function createIPCHandlerModule(): AppModule {
   return {
