@@ -1,5 +1,43 @@
 packages:
   - packages/*
+
+catalog:
+  '@antfu/eslint-config': ^5.4.1
+  '@element-plus/icons-vue': '*'
+  '@npmcli/map-workspaces': 5.0.0
+  '@playwright/test': 1.55.0
+  '@types/http-proxy-middleware': '*'
+  '@types/live-server': '*'
+  '@types/node': 24.5.2
+  '@vitejs/plugin-vue': '*'
+  '@vitest/ui': 3.2.4
+  '@vue/tsconfig': ^0.8.1
+  create-vite: 7.1.2
+  cross-env: ^10.0.0
+  electron: 38.1.2
+  electron-builder: 26.0.12
+  electron-devtools-installer: '*'
+  electron-store: '*'
+  electron-updater: '*'
+  element-plus: '*'
+  glob: 11.0.3
+  http-proxy-middleware: '*'
+  jiti: ^2.6.0
+  jsdom: ^27.0.0
+  live-server: '*'
+  mlly: '*'
+  nodemon: '*'
+  oxlint: ^1.18.0
+  playwright: ^1.55.1
+  tsup: '*'
+  turbo: ^2.5.8
+  typescript: ^5.9.2
+  vite: npm:rolldown-vite@^7.1.13
+  vitest: ^4.0.0-beta.13
+  vue: '*'
+  vue-tsc: '*'
+  zod: '*'
+
 onlyBuiltDependencies:
   - electron
   - electron-winstaller

@@ -53,7 +53,7 @@ function addTheMainProperty() {
   }
 
   pkgJson.main = './dist/index.html'
-  pkgJson.exports = { ...(pkgJson?.exports ?? {}), '.': { default: pkgJson.main } }
+  pkgJson.exports = { ...pkgJson?.exports, '.': { default: pkgJson.main } }
   savePkg()
 }
 

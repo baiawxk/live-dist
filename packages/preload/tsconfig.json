@@ -9,7 +9,10 @@
     },
     "types": ["node"],
     "strict": true,
-    "sourceMap": false,
+    "exactOptionalPropertyTypes": false,
+    "noUncheckedIndexedAccess": true,
+    "useUnknownInCatchVariables": false,
+    "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "skipLibCheck": true

@@ -11,7 +11,6 @@ const setupDistMgr = distApi.createIpcSetupFn({
     return await distManager.getAllDists()
   },
   addDist: async (config) => {
-    const distManager = new DistManager()
     try {
       const result = await distManager.addDist(config)
       console.log('addDist result in main:', result)
@@ -32,7 +31,7 @@ const setupDistMgr = distApi.createIpcSetupFn({
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory'],
     })
-    return result.canceled ? null : result.filePaths[0]
+    return result.canceled || !result.filePaths[0] ? null : result.filePaths[0]
   },
 })
 

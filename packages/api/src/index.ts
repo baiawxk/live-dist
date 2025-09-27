@@ -1,3 +1,3 @@
-export * from './modules/distMgr.js'
-export * from './modules/liveServer.js'
-export * from './modules/shell.js'
+export * from './modules/distMgr'
+export * from './modules/liveServer'
+export * from './modules/shell'

@@ -6,5 +6,8 @@
   "files": [],
   "scripts": {
     "start": "node index.js --no-warnings"
+  },
+  "devDependencies": {
+    "vite": "catalog:"
   }
 }
