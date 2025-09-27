@@ -17,11 +17,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "^4.1.11"
+    "zod": "*"
   },
   "devDependencies": {
-    "tsup": "^8.5.0",
-    "typescript": "^5.0.0",
-    "vite": "npm:rolldown-vite@^7.1.13"
+    "tsup": "*",
+    "typescript": "*",
+    "vite": "*"
   }
 }

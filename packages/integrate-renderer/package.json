@@ -8,6 +8,6 @@
     "start": "node index.js --no-warnings"
   },
   "devDependencies": {
-    "vite": "^7.1.7"
+    "vite": "*"
   }
 }
