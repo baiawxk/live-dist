@@ -21,7 +21,8 @@
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "compile": "pnpm run build && electron-builder build --config electron-builder.mjs",
-    "test": "playwright test ./tests/e2e.spec.ts",
+    "test:e2e": "playwright test ./tests/e2e.spec.ts",
+    "test": "vitest",
     "start": "node packages/dev-mode.js",
     "typecheck": "turbo run typecheck",
     "lint": "eslint .",
@@ -48,10 +49,12 @@
     "electron-builder": "catalog:",
     "glob": "catalog:",
     "jiti": "catalog:",
+    "jsdom": "catalog:",
     "oxlint": "catalog:",
     "playwright": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   }
 }
