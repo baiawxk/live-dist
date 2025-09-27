@@ -1,31 +1,42 @@
 packages:
   - packages/*
+catalog:
+  '@antfu/eslint-config': ^5.4.1
+  '@element-plus/icons-vue': '*'
+  '@npmcli/map-workspaces': 5.0.0
+  '@playwright/test': 1.55.0
+  '@types/http-proxy-middleware': '*'
+  '@types/live-server': '*'
+  '@types/node': 24.5.2
+  '@vitejs/plugin-vue': '*'
+  '@vue/tsconfig': ^0.8.1
+  create-vite: 7.1.2
+  cross-env: ^10.0.0
+  electron: 38.1.2
+  electron-builder: 26.0.12
+  electron-devtools-installer: '*'
+  electron-store: '*'
+  electron-updater: '*'
+  element-plus: '*'
+  glob: 11.0.3
+  http-proxy-middleware: '*'
+  jiti: ^2.5.1
+  live-server: '*'
+  mlly: '*'
+  nodemon: '*'
+  oxlint: ^1.18.0
+  playwright: ^1.55.0
+  tsup: '*'
+  turbo: ^2.5.8
+  typescript: ^5.9.2
+  vite: npm:rolldown-vite@^7.1.13
+  vue: '*'
+  vue-tsc: '*'
+  zod: '*'
+
 onlyBuiltDependencies:
   - electron
   - electron-winstaller
   - esbuild
   - fsevents
   - vue-demi
-
-pnpm:
-  overrides:
-    vite: npm:rolldown-vite@^7.1.13
-    typescript: ^5.9.2
-    cross-env: ^10.0.0
-    '@types/node': 24.5.2
-    electron: 38.1.2
-    electron-builder: 26.0.12
-    electron-store: ^10.1.0
-    electron-updater: 6.6.2
-    'http-proxy-middleware': ^3.0.5
-    'live-server': ^1.2.2
-    'electron-devtools-installer': 4.0.0
-    nodemon: ^3.1.10
-    zod: ^4.1.11
-    tsup: ^8.5.0
-    mlly: 1.8.0
-    '@element-plus/icons-vue': ^2.3.2
-    'element-plus': ^2.11.3
-    vue: ^3.5.21
-    '@vitejs/plugin-vue': ^6.0.1
-    'vue-tsc': ^3.0.7

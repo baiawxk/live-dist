@@ -16,15 +16,15 @@
   },
   "dependencies": {
     "@app/preload": "workspace:*",
-    "@element-plus/icons-vue": "*",
-    "element-plus": "*",
-    "vue": "*"
+    "@element-plus/icons-vue": "catalog:",
+    "element-plus": "catalog:",
+    "vue": "catalog:"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "*",
-    "@vue/tsconfig": "^0.8.1",
-    "typescript": "*",
-    "vite": "*",
-    "vue-tsc": "*"
+    "@vitejs/plugin-vue": "catalog:",
+    "@vue/tsconfig": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue-tsc": "catalog:"
   }
 }

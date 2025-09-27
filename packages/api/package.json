@@ -17,11 +17,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "*"
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "tsup": "*",
-    "typescript": "*",
-    "vite": "*"
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }

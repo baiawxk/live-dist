@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@app/electron-versions": "workspace:*",
-    "mlly": "*",
-    "vite": "*"
+    "mlly": "catalog:",
+    "vite": "catalog:"
   }
 }

@@ -8,6 +8,6 @@
     "start": "node index.js --no-warnings"
   },
   "devDependencies": {
-    "vite": "*"
+    "vite": "catalog:"
   }
 }

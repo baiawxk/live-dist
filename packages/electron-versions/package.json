@@ -5,6 +5,6 @@
   "main": "./index.js",
   "files": [],
   "devDependencies": {
-    "vite": "*"
+    "vite": "catalog:"
   }
 }
