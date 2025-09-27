@@ -10,6 +10,7 @@ catalog:
   '@types/live-server': '*'
   '@types/node': 24.5.2
   '@vitejs/plugin-vue': '*'
+  '@vitest/ui': 3.2.4
   '@vue/tsconfig': ^0.8.1
   create-vite: 7.1.2
   cross-env: ^10.0.0
