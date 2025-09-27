@@ -11,7 +11,6 @@ const setupDistMgr = distApi.createIpcSetupFn({
     return await distManager.getAllDists()
   },
   addDist: async (config) => {
-    const distManager = new DistManager()
     try {
       const result = await distManager.addDist(config)
       console.log('addDist result in main:', result)
