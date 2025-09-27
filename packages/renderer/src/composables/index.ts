@@ -1,2 +1,2 @@
-export * from './useDistManager'
 export * from './useDistForm'
+export * from './useDistManager'

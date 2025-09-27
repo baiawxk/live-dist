@@ -1,7 +1,7 @@
 import type { DistConfig } from '@/types/dist'
 import { distMgr, serverMgr, shell } from '@app/preload'
 import { ElMessage } from 'element-plus'
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
 // 创建共享的状态
 const distList = ref<DistConfig[]>([])

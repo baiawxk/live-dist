@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useDistForm } from '@/composables/useDistForm'
-import { computed, watch } from 'vue'
 import type { DistConfig } from '@/types/dist'
+import { computed, watch } from 'vue'
+import { useDistForm } from '@/composables/useDistForm'
 
 const props = defineProps<{
   visible: boolean
@@ -13,7 +13,7 @@ const emit = defineEmits<{
   (e: 'update:visible', visible: boolean): void
 }>()
 
-const { 
+const {
   formRef,
   form,
   rules,
@@ -26,14 +26,15 @@ const {
 // 监听 visible 变化
 const visibleModel = computed({
   get: () => props.visible,
-  set: (value) => emit('update:visible', value)
+  set: value => emit('update:visible', value),
 })
 
 // 监听初始数据变化
 watch(() => props.initialData, (newVal) => {
   if (newVal) {
     form.value = { ...newVal }
-  } else {
+  }
+  else {
     form.value = {
       id: '',
       name: '',
@@ -44,7 +45,7 @@ watch(() => props.initialData, (newVal) => {
   }
 }, { immediate: true })
 
-const handleSave = async () => {
+async function handleSave() {
   await saveDistConfig()
   visibleModel.value = false
 }

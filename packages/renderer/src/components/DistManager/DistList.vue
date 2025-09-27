@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import type { DistConfig } from '@/types/dist'
-import { useDistManager } from '@/composables/useDistManager'
 import { ElMessageBox } from 'element-plus'
 import { onMounted } from 'vue'
+import { useDistManager } from '@/composables/useDistManager'
+
+const emit = defineEmits<{
+  (e: 'edit', dist: DistConfig): void
+  (e: 'add'): void
+}>()
 
 const {
   distList,
@@ -15,11 +20,6 @@ const {
   openInBrowser,
   removeDist,
 } = useDistManager()
-
-const emit = defineEmits<{
-  (e: 'edit', dist: DistConfig): void
-  (e: 'add'): void
-}>()
 
 // 确保组件挂载时加载列表
 onMounted(async () => {
