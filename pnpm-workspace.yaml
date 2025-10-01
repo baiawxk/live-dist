@@ -20,6 +20,7 @@ catalog:
   electron-store: '*'
   electron-updater: '*'
   element-plus: '*'
+  find-process: ^2.0.0
   glob: 11.0.3
   http-proxy-middleware: '*'
   jiti: ^2.6.0
@@ -29,6 +30,7 @@ catalog:
   nodemon: '*'
   oxlint: ^1.18.0
   playwright: ^1.55.1
+  tree-kill: ^1.2.2
   tsup: '*'
   turbo: ^2.5.8
   typescript: ^5.9.2
