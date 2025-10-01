@@ -47,15 +47,7 @@
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-*Based on constitution v1.4.5:*
-- All development code and test code must be placed in the appropriate package and not in the root directory
-- All code should follow the development conventions of the corresponding package it belongs to
-- Web pages will not directly import Electron APIs; they should only request or load Electron modules indirectly through the preload module
-- Background processes communicate with the Electron main process exclusively through IPC calls; frontend components MUST NOT make HTTP requests to call backend API services
-- Use @app/api layer to build API types and type definitions; main and preload processes must use the API layer's tool methods to establish IPC connections
-- When integrating features into the UI: If the feature extends an existing function, extend the current UI entry point; If the feature is new and distinct, create a new menu entry; If unsure about how to integrate with existing code or functionality, raise clarification questions during the design phase
-- For refactoring tasks: MUST analyze existing implementation, determine integration approach with existing functionality, ensure refactored code is actually used and replaces original implementation, and maintain functional consistency
-- Code should be tested in the following sequence: first perform global typecheck with turbo, then perform global unit tests with vitest, then perform actual code testing with turbo dev, and finally fix all eslint issues with eslint --fix
+[Gates determined based on constitution file]
 
 ## Project Structure
 
@@ -224,4 +216,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v2.1.1 - See `/memory/constitution.md`*
+*Based on Constitution v1.3.0 - See `/memory/constitution.md`*

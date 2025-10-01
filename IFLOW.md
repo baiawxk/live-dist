@@ -8,7 +8,6 @@
 - **Vue.js 3**: 作为前端框架（renderer 包中使用）
 - **Element Plus**: 用于 UI 组件
 - **TypeScript**: 用于类型安全
-- **Playwright**: 用于端到端测试
 - **Zod**: 用于 IPC 通信的数据验证
 - **Vitest**: 用于单元测试
 
@@ -101,7 +100,6 @@ pnpm init
 2. **安全性**: 遵循 Electron 安全指南，使用上下文隔离和预加载脚本。
 3. **TypeScript**: 全项目使用 TypeScript 进行类型检查。
 4. **Monorepo**: 使用 pnpm workspaces 管理多个包。
-5. **环境变量**: 使用 `import.meta.env` 访问环境变量，只有以 `VITE_` 为前缀的变量才会暴露给客户端代码。
 6. **API 设计**: 使用 Zod 进行严格的类型验证，确保 IPC 通信的安全性和可靠性。
 7. **IPC 通信**: 采用基于 Zod 的类型安全 IPC 通信机制，确保主进程和渲染进程之间的通信安全可靠。
 8. **测试**: 使用 Vitest 进行单元测试，为每个包提供独立的测试环境。

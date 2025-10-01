@@ -100,6 +100,17 @@ When creating this spec from a user prompt:
 - [ ] Scope is clearly bounded
 - [ ] Dependencies and assumptions identified
 
+### Constitution Alignment
+- [ ] Requirements do not conflict with monorepo architecture principles
+- [ ] Security requirements align with preload-based Electron API access
+- [ ] Implementation approach follows type safety requirements
+- [ ] Proposed solution adheres to test-driven development practices
+- [ ] Communication architecture follows IPC-only pattern (no HTTP API calls from frontend)
+- [ ] Use of @app/api layer for API types and definitions is planned where applicable
+- [ ] UI integration approach follows entry point and navigation principles
+- [ ] For refactoring tasks: Analysis of existing implementation is planned, integration approach with existing functionality is defined, and refactored code usage is confirmed to replace original implementation
+- [ ] Code placement follows directory structure awareness principles (code in appropriate packages, not in root directory)
+
 ---
 
 ## Execution Status

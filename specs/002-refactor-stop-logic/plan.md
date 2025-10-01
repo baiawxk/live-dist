@@ -1,8 +1,7 @@
+# Implementation Plan: Optimize Server Stop Logic
 
-# Implementation Plan: [FEATURE]
-
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+**Branch**: `002-refactor-stop-logic` | **Date**: 2025-10-01 | **Spec**: [link](./spec.md)
+**Input**: Feature specification from `/specs/002-refactor-stop-logic/spec.md`
 
 ## Execution Flow (/plan command scope)
 ```
@@ -31,31 +30,31 @@
 - Phase 3-4: Implementation execution (manual or via tools)
 
 ## Summary
-[Extract from feature spec: primary requirement + technical approach from research]
+Refactor the server stop logic to use find-process and tree-kill libraries for more reliable process termination. The system will first attempt SIGTERM, then SIGKILL, and only use tree-kill as a last resort. It will identify if a process on a port was started by this application using executable path matching and only require confirmation for processes started by other applications.
 
 ## Technical Context
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: TypeScript 5.6, Node.js >=22.0.0 
+**Primary Dependencies**: find-process, tree-kill, live-server, http-proxy-middleware
+**Storage**: N/A
+**Testing**: Vitest with workspace configuration
+**Target Platform**: Cross-platform desktop (Windows, macOS, Linux) via Electron
+**Project Type**: Electron desktop application with Vue.js 3 frontend
+**Performance Goals**: Stop operations complete within 10 seconds, immediate feedback to UI
+**Constraints**: <10s timeout for termination, max 10 concurrent server processes, process identification using executable path
+**Scale/Scope**: Up to 10 concurrent server processes per user
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-*Based on constitution v1.4.5:*
-- All development code and test code must be placed in the appropriate package and not in the root directory
-- All code should follow the development conventions of the corresponding package it belongs to
-- Web pages will not directly import Electron APIs; they should only request or load Electron modules indirectly through the preload module
-- Background processes communicate with the Electron main process exclusively through IPC calls; frontend components MUST NOT make HTTP requests to call backend API services
-- Use @app/api layer to build API types and type definitions; main and preload processes must use the API layer's tool methods to establish IPC connections
-- When integrating features into the UI: If the feature extends an existing function, extend the current UI entry point; If the feature is new and distinct, create a new menu entry; If unsure about how to integrate with existing code or functionality, raise clarification questions during the design phase
-- For refactoring tasks: MUST analyze existing implementation, determine integration approach with existing functionality, ensure refactored code is actually used and replaces original implementation, and maintain functional consistency
-- Code should be tested in the following sequence: first perform global typecheck with turbo, then perform global unit tests with vitest, then perform actual code testing with turbo dev, and finally fix all eslint issues with eslint --fix
+*Based on constitution v1.4.4:*
+- All development code and test code must be placed in the appropriate package and not in the root directory ✓
+- All code should follow the development conventions of the corresponding package it belongs to ✓
+- Web pages will not directly import Electron APIs; they should only request or load Electron modules indirectly through the preload module ✓
+- Background processes communicate with the Electron main process exclusively through IPC calls; frontend components MUST NOT make HTTP requests to call backend API services ✓
+- Use @app/api layer to build API types and type definitions; main and preload processes must use the API layer's tool methods to establish IPC connections ✓
+- When integrating features into the UI: If the feature extends an existing function, extend the current UI entry point; If the feature is new and distinct, create a new menu entry; If unsure about how to integrate with existing code or functionality, raise clarification questions during the design phase ✓
+- For refactoring tasks: MUST analyze existing implementation, determine integration approach with existing functionality, ensure refactored code is actually used and replaces original implementation, and maintain functional consistency ✓
+- Code should be tested in the following sequence: first perform global typecheck with turbo, then perform global unit tests with vitest, then perform actual code testing with turbo dev, and finally fix all eslint issues with eslint --fix ✓
 
 ## Project Structure
 
@@ -71,50 +70,28 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 ```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+apps/
+├── main/                # Electron main process
+│   ├── src/
+│   ├── __tests__/
+│   └── preload/
+├── renderer/            # Vue.js 3 renderer process
+│   ├── src/
+│   ├── __tests__/
+│   └── public/
+└── api/                 # IPC API definitions
+    ├── src/
+    └── __tests__/
 
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+packages/
+├── @app/
+│   ├── api/             # IPC API types and definitions
+│   └── core/            # Shared core functionality
+└── @app/ui/             # Shared UI components
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: This is a desktop application built with Electron, Vue.js 3, and TypeScript. The architecture follows a modular monorepo pattern with separate packages for main process, renderer process, and shared API definitions. The process management feature will be implemented primarily in the main process with IPC communication to the renderer process for UI interactions.
 
 ## Phase 0: Outline & Research
 1. **Extract unknowns from Technical Context** above:
@@ -210,17 +187,17 @@ directories captured above]
 *This checklist is updated during execution flow*
 
 **Phase Status**:
-- [ ] Phase 0: Research complete (/plan command)
-- [ ] Phase 1: Design complete (/plan command)
-- [ ] Phase 2: Task planning complete (/plan command - describe approach only)
+- [x] Phase 0: Research complete (/plan command)
+- [x] Phase 1: Design complete (/plan command)
+- [x] Phase 2: Task planning complete (/plan command - describe approach only)
 - [ ] Phase 3: Tasks generated (/tasks command)
 - [ ] Phase 4: Implementation complete
 - [ ] Phase 5: Validation passed
 
 **Gate Status**:
-- [ ] Initial Constitution Check: PASS
-- [ ] Post-Design Constitution Check: PASS
-- [ ] All NEEDS CLARIFICATION resolved
+- [x] Initial Constitution Check: PASS
+- [x] Post-Design Constitution Check: PASS
+- [x] All NEEDS CLARIFICATION resolved
 - [ ] Complexity deviations documented
 
 ---

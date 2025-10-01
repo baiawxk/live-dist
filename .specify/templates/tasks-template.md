@@ -116,6 +116,16 @@ Task: "Integration test auth in tests/integration/test_auth.py"
    - Setup → Tests → Models → Services → Endpoints → Polish
    - Dependencies block parallel execution
 
+5. **Constitution Compliance**:
+   - All development code and test code must be placed in the appropriate package and not in the root directory
+   - Web pages will not directly import Electron APIs; they should only request or load Electron modules indirectly through the preload module
+   - Background processes communicate with the Electron main process exclusively through IPC calls; frontend components MUST NOT make HTTP requests to call backend API services
+   - Use @app/api layer to build API types and type definitions; main and preload processes must use the API layer's tool methods to establish IPC connections
+   - When integrating features into the UI: If the feature extends an existing function, extend the current UI entry point; If the feature is new and distinct, create a new menu entry; If unsure about how to integrate with existing code or functionality, raise clarification questions during the design phase
+   - For refactoring tasks: MUST analyze existing implementation, determine integration approach with existing functionality, ensure refactored code is actually used and replaces original implementation, and maintain functional consistency
+   - Each package should follow its own development conventions as specified in the package's documentation
+   - Every code adjustment must recognize the current project directory structure, ensure code is placed as expected, maintain clean architecture, and ensure clean naming
+
 ## Validation Checklist
 *GATE: Checked by main() before returning*
 
