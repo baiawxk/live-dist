@@ -11,6 +11,8 @@
   "scripts": {
     "dev": "node ../dev-mode.js",
     "build": "vite build",
+    "lint": "eslint --fix",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
