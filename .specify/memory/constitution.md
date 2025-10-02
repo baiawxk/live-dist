@@ -30,9 +30,6 @@ Every code adjustment must recognize the current project directory structure, en
 ### Static Directory Management Focus
 Application specifically designed to manage multiple static file directories and serve them via local server; Each directory served with proper MIME types and security headers; Support for directory browsing, file serving, and access control
 
-### Optimized Server Process Management
-Server processes are managed efficiently using find-process and tree-kill libraries; The system can identify if a process on a port was started by this application before stopping; Non-responsive servers are terminated quickly using process-level operations
-
 ### Test-Driven Development (NON-NEGOTIABLE)
 Unit tests mandatory using Vitest with workspace configuration; Each package has independent vitest configuration with __tests__ directory at the same level as src; Test files follow __tests__/**/*.test.ts naming convention with .test extension required; All IPC communications verified with contract tests; IPC APIs must have corresponding unit tests that can run without starting Electron, testing only API functionality; TDD approach required before implementation
 
@@ -53,7 +50,7 @@ When performing refactoring tasks: MUST first analyze the existing implementatio
 
 ## Technology Stack Requirements
 
-Electron for cross-platform desktop application; Vite for fast build and development; Vue.js 3 with Element Plus for UI components; TypeScript for type safety; Zod for IPC validation; Vitest for unit testing with workspace configuration; pnpm for node module management; Turbo for monorepo management; find-process and tree-kill for server process management
+Electron for cross-platform desktop application; Vite for fast build and development; Vue.js 3 with Element Plus for UI components; TypeScript for type safety; Zod for IPC validation; Vitest for unit testing with workspace configuration; pnpm for node module management; Turbo for monorepo management; find-process for server process management
 
 ## Development Workflow and Conventions
 

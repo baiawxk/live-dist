@@ -218,7 +218,7 @@ pnpm init
 ## 新增功能和改进
 
 ### 进程管理增强
-- 使用 `find-process` 和 `tree-kill` 库来更好地管理服务器进程
+- 使用 `find-process`  库来更好地管理服务器进程
 - 改进了服务器启动和停止的逻辑，包括端口冲突检测和强制关闭机制
 - 增加了更完善的错误处理和超时机制
 
@@ -233,5 +233,4 @@ pnpm init
 - [ ] 更新Readme.md
 - [ ] app/api > ipc
 - [ ] refine ci
-- [x] use find-process to find-process use by this app or other process. if others ,remaind not to kill ,if is this app,can kill, use liveServer to startServer, use tree-kill to stopServer 
 - [ ] use sqlite3 to save app data

@@ -23,8 +23,7 @@
     "electron-updater": "catalog:",
     "find-process": "catalog:",
     "http-proxy-middleware": "catalog:",
-    "live-server": "catalog:",
-    "tree-kill": "catalog:"
+    "live-server": "catalog:"
   },
   "devDependencies": {
     "@app/electron-versions": "workspace:*",
