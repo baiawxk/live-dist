@@ -1,9 +1,9 @@
-# Feature Specification: Optimize Server Stop Logic
+# Feature Specification: Unify Server Management API
 
 **Feature Branch**: `002-refactor-stop-logic`  
 **Created**: 2025-10-01  
 **Status**: Draft  
-**Input**: User description: "重构计划，使用find-process 和 tree-kill 去优化服务器的停止逻辑。 通过find-process + 端口获取服务的运行状态，通过find-process 暴露的进程名字可以获取端口对应的服务是本程序启动的还是其他程序启动， 如果是本程序启动，则可以安全停止，就是首先尝试SIGTERM, 然后是SIGKILL，如果前两者无法终止进程，则通过tree-kill 去kill port，从而停止进程。如果非本程序启动的，则也可以停止，但UI 上要让用户确认，是否可以直接kill。 再者就是通过优先使用SIGTERM/SIGKILL，tree-kill作为最后手段来停止服务， 而不是直接的调用live-server 的close 或者shutdown去停止，先尝试安全信号方法，然后是强制终止，会更安全，更直接。 不用retry，之前写的太复杂了。"
+**Input**: User description: "重构计划，使用find-process 和 tree-kill 去优化服务器的停止逻辑，并将新的服务器状态API与现有的liveServer API合并为统一的服务器管理API。 通过find-process + 端口获取服务的运行状态，通过find-process 暴露的进程名字可以获取端口对应的服务是本程序启动的还是其他程序启动， 如果是本程序启动，则可以安全停止，就是首先尝试SIGTERM, 然后是SIGKILL，如果前两者无法终止进程，则通过tree-kill 去kill port，从而停止进程。如果非本程序启动的，则也可以停止，但UI 上要让用户确认，是否可以直接kill。 再者就是通过优先使用SIGTERM/SIGKILL，tree-kill作为最后手段来停止服务， 而不是直接的调用live-server 的close 或者shutdown去停止，先尝试安全信号方法，然后是强制终止，会更安全，更直接。 不用retry，之前写的太复杂了。"
 
 ## Execution Flow (main)
 ```
@@ -55,7 +55,7 @@ When creating this spec from a user prompt:
 ## User Scenarios & Testing *(mandatory)*
 
 ### Primary User Story
-A user is managing multiple directory servers and wants to stop a server, either one they started with the application or one that's already running on the same port. The user expects the application to handle both scenarios safely - automatically stopping servers that were started by the application, and prompting for confirmation when stopping servers that were started by other applications. The user accesses server status information through the UI, which retrieves it via IPC from the main process. The stop operation should be fast and reliable without hanging or requiring multiple attempts.
+A user is managing multiple directory servers and wants to perform various server operations (start, stop, check status) using a unified interface. The user wants to stop a server, either one they started with the application or one that's already running on the same port. The user expects the application to handle both scenarios safely - automatically stopping servers that were started by the application, and prompting for confirmation when stopping servers that were started by other applications. The user accesses server status information through the UI, which retrieves it via a unified server management API from the main process. The stop operation should be fast and reliable without hanging or requiring multiple attempts, and all server operations should be accessible through a single cohesive API.
 
 ### Acceptance Scenarios
 1. **Given** a server was started by this application, **When** the user requests to stop that server, **Then** the server stops immediately without confirmation prompts
@@ -81,7 +81,7 @@ A user is managing multiple directory servers and wants to stop a server, either
 - **FR-003**: System MUST prompt user for confirmation when attempting to stop servers not started by this application
 - **FR-004**: Users MUST be able to proceed with stopping external servers after confirmation
 - **FR-005**: System MUST stop servers quickly and reliably without requiring multiple attempts
-- **FR-006**: System MUST provide clear status information about running servers via IPC from main process to UI
+- **FR-006**: System MUST provide clear status information about running servers via unified server management API from main process to UI
 - **FR-007**: System MUST handle non-responsive servers by first attempting SIGTERM, then SIGKILL before forcing termination with tree-kill if necessary
 - **FR-008**: Users MUST receive immediate feedback when a server stop command is initiated
 - **FR-009**: System MUST prevent hanging or freezing during server stop operations
@@ -89,6 +89,10 @@ A user is managing multiple directory servers and wants to stop a server, either
 - **FR-011**: System MUST provide detailed process information to users when confirmation is needed to stop externally started servers
 - **FR-012**: System MUST use precise process identification to ensure only the target liveServer process is terminated, not the parent Electron process
 - **FR-013**: System MUST use more precise process identification methods to avoid incorrectly killing parent processes
+- **FR-014**: System MUST provide unified server management API that consolidates start, stop, and status operations into a single cohesive interface
+- **FR-015**: System MUST merge the existing liveServer API with the new server management functionality and replace the legacy API with the unified interface
+- **FR-016**: System MUST return an error indicating when attempting to start a server on an already used port, with appropriate UI messaging to inform the user of the conflict
+- **FR-017**: System MUST migrate existing configuration settings to the unified format during the API unification process
 
 ### Non-Functional Requirements
 - **NFR-001**: System MUST timeout force termination attempts after 10 seconds if server is unresponsive
@@ -100,6 +104,7 @@ A user is managing multiple directory servers and wants to stop a server, either
 - **NFR-007**: System MUST provide detailed process information (PID, process name, command line arguments) when asking user to confirm stop of external processes
 - **NFR-008**: Multiple server stop operations SHOULD run in parallel for faster completion
 - **NFR-009**: System SHOULD provide feedback to UI as soon as possible during stop operations, but no specific timeframe requirement
+- **NFR-010**: System MUST provide detailed performance metrics for all server start/stop operations
 
 ### User Interface Requirements
 - **UIR-001**: Confirmation prompts for external server termination MUST use a modal dialog approach
@@ -131,6 +136,11 @@ A user is managing multiple directory servers and wants to stop a server, either
 - Q: 在终止进程时，是否需要先尝试SIGTERM然后是SIGKILL，还是直接使用tree-kill强制终止？ → A: 先尝试sigterm 然后是sigkill，如果前两者已经可以kill，那么可以不用引入tree-kill
 - Q: When stopping multiple servers concurrently, should the system handle these operations sequentially to avoid resource conflicts, or should they run in parallel for faster completion? → A: B
 - Q: For performance expectations during server stop operations, should the system provide immediate feedback to the user interface within a specific timeframe? → A: C
+- Q: How should the unified server management API handle existing liveServer API calls to maintain backward compatibility? → A: just merge the liveServer api,than replace it
+- Q: For the unified API, what should be the default behavior when starting a server on a port that's already in use? → A: throw a error indicating the port is in use, then the ui will display a human message to this case, then the user will know this case
+- Q: What security measures should be implemented for the unified server management API to prevent unauthorized server operations? → A: no need
+- Q: Should the unified API provide detailed performance metrics for server start/stop operations? → A: a
+- Q: How should the unified API handle configuration settings that differ between the original liveServer API and new functionality? → A: c
 
 ## Review & Acceptance Checklist
 *GATE: Automated checks run during main() execution*

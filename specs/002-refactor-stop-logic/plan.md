@@ -1,6 +1,7 @@
-# Implementation Plan: Optimize Server Stop Logic
 
-**Branch**: `002-refactor-stop-logic` | **Date**: 2025-10-01 | **Spec**: [link](./spec.md)
+# Implementation Plan: Unify Server Management API
+
+**Branch**: `002-refactor-stop-logic` | **Date**: 2025-10-02 | **Spec**: [spec.md](spec.md)
 **Input**: Feature specification from `/specs/002-refactor-stop-logic/spec.md`
 
 ## Execution Flow (/plan command scope)
@@ -30,37 +31,46 @@
 - Phase 3-4: Implementation execution (manual or via tools)
 
 ## Summary
-Refactor the server stop logic to use find-process and tree-kill libraries for more reliable process termination. The system will first attempt SIGTERM, then SIGKILL, and only use tree-kill as a last resort. It will identify if a process on a port was started by this application using executable path matching and only require confirmation for processes started by other applications.
+This feature will refactor the server stop logic to use find-process and tree-kill libraries for more reliable process management. It will unify the existing liveServer API with new server management functionality to create a single cohesive interface for starting, stopping, and checking server status. The system will identify whether servers were started by this application or external processes, automatically stopping internal servers while prompting for confirmation when stopping external ones. Process termination will follow a safe sequence: SIGTERM, then SIGKILL, with tree-kill as a last resort.
 
 ## Technical Context
-**Language/Version**: TypeScript 5.6, Node.js >=22.0.0 
-**Primary Dependencies**: find-process, tree-kill, live-server, http-proxy-middleware
-**Storage**: N/A
-**Testing**: Vitest with workspace configuration
-**Target Platform**: Cross-platform desktop (Windows, macOS, Linux) via Electron
-**Project Type**: Electron desktop application with Vue.js 3 frontend
-**Performance Goals**: Stop operations complete within 10 seconds, immediate feedback to UI
-**Constraints**: <10s timeout for termination, max 10 concurrent server processes, process identification using executable path
-**Scale/Scope**: Up to 10 concurrent server processes per user
+**Language/Version**: TypeScript (Node.js >=22.0.0)  
+**Primary Dependencies**: find-process, tree-kill, live-server, Electron, Vite, Vue.js 3, Element Plus, Zod  
+**Storage**: electron-store (JSON file-based storage)  
+**Testing**: Vitest with workspace configuration  
+**Target Platform**: Cross-platform desktop (Windows, macOS, Linux)
+**Project Type**: web (Electron desktop application with main and renderer processes)  
+**Performance Goals**: Server stop operations should complete within 10 seconds  
+**Constraints**: Must not terminate parent Electron process when stopping child liveServer processes  
+**Scale/Scope**: Configurable number of concurrent server processes (default maximum of 10)
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-*Based on constitution v1.4.4:*
-- All development code and test code must be placed in the appropriate package and not in the root directory ✓
-- All code should follow the development conventions of the corresponding package it belongs to ✓
-- Web pages will not directly import Electron APIs; they should only request or load Electron modules indirectly through the preload module ✓
-- Background processes communicate with the Electron main process exclusively through IPC calls; frontend components MUST NOT make HTTP requests to call backend API services ✓
-- Use @app/api layer to build API types and type definitions; main and preload processes must use the API layer's tool methods to establish IPC connections ✓
-- When integrating features into the UI: If the feature extends an existing function, extend the current UI entry point; If the feature is new and distinct, create a new menu entry; If unsure about how to integrate with existing code or functionality, raise clarification questions during the design phase ✓
-- For refactoring tasks: MUST analyze existing implementation, determine integration approach with existing functionality, ensure refactored code is actually used and replaces original implementation, and maintain functional consistency ✓
-- Code should be tested in the following sequence: first perform global typecheck with turbo, then perform global unit tests with vitest, then perform actual code testing with turbo dev, and finally fix all eslint issues with eslint --fix ✓
+*Based on constitution v1.4.5:*
+- All development code and test code must be placed in the appropriate package and not in the root directory
+- All code should follow the development conventions of the corresponding package it belongs to
+- Web pages will not directly import Electron APIs; they should only request or load Electron modules indirectly through the preload module
+- Background processes communicate with the Electron main process exclusively through IPC calls; frontend components MUST NOT make HTTP requests to call backend API services
+- Use @app/api layer to build API types and type definitions; main and preload processes must use the API layer's tool methods to establish IPC connections
+- When integrating features into the UI: If the feature extends an existing function, extend the current UI entry point; If the feature is new and distinct, create a new menu entry; If unsure about how to integrate with existing code or functionality, raise clarification questions during the design phase
+- For refactoring tasks: MUST analyze existing implementation, determine integration approach with existing functionality, ensure refactored code is actually used and replaces original implementation, and maintain functional consistency
+- Code should be tested in the following sequence: first perform global typecheck with turbo, then perform global unit tests with vitest, then perform actual code testing with turbo dev, and finally fix all eslint issues with eslint --fix
+
+**Evaluation**: 
+All constitutional principles are satisfied by this implementation plan:
+1. Code will be placed in appropriate packages (@app/main, @app/api, @app/preload)
+2. Will follow existing development conventions in each package
+3. IPC communication will be used exclusively for process management between renderer and main
+4. @app/api layer will be used for type definitions and IPC connections
+5. This is a refactoring task that extends existing server management functionality
+6. Will ensure proper testing sequence is followed
 
 ## Project Structure
 
 ### Documentation (this feature)
 ```
-specs/[###-feature]/
+specs/002-refactor-stop-logic/
 ├── plan.md              # This file (/plan command output)
 ├── research.md          # Phase 0 output (/plan command)
 ├── data-model.md        # Phase 1 output (/plan command)
@@ -71,27 +81,20 @@ specs/[###-feature]/
 
 ### Source Code (repository root)
 ```
-apps/
-├── main/                # Electron main process
-│   ├── src/
-│   ├── __tests__/
-│   └── preload/
-├── renderer/            # Vue.js 3 renderer process
-│   ├── src/
-│   ├── __tests__/
-│   └── public/
-└── api/                 # IPC API definitions
-    ├── src/
-    └── __tests__/
-
 packages/
-├── @app/
-│   ├── api/             # IPC API types and definitions
-│   └── core/            # Shared core functionality
-└── @app/ui/             # Shared UI components
+├── api/
+│   └── src/
+│       └── modules/
+├── main/
+│   └── src/
+│       ├── ipc/
+│       ├── services/
+│       └── utils/
+└── preload/
+    └── src/
 ```
 
-**Structure Decision**: This is a desktop application built with Electron, Vue.js 3, and TypeScript. The architecture follows a modular monorepo pattern with separate packages for main process, renderer process, and shared API definitions. The process management feature will be implemented primarily in the main process with IPC communication to the renderer process for UI interactions.
+**Structure Decision**: Web application structure with Electron main and renderer processes. The feature will primarily affect the main process where server management occurs, with API definitions in the api package and IPC exposure in the preload package.
 
 ## Phase 0: Outline & Research
 1. **Extract unknowns from Technical Context** above:
@@ -165,6 +168,34 @@ packages/
 
 **Estimated Output**: 25-30 numbered, ordered tasks in tasks.md
 
+**Task Categories**:
+1. **API Layer Tasks**:
+   - Create Zod schemas for server management API contracts
+   - Define IPC channel interfaces in @app/api package
+   - Create type definitions for server entities (ServerStatus, ProcessIdentity, etc.)
+
+2. **Main Process Tasks**:
+   - Implement process identification using find-process library
+   - Implement process termination logic with SIGTERM → SIGKILL → tree-kill sequence
+   - Create server management service that unifies liveServer API with new functionality
+   - Implement IPC handlers for server management operations
+   - Add performance metrics collection for server operations
+
+3. **Preload Tasks**:
+   - Expose server management IPC APIs to renderer securely
+   - Implement proper validation and error handling for IPC calls
+
+4. **Renderer Tasks**:
+   - Update UI components to use unified server management API
+   - Implement confirmation dialogs for external process termination
+   - Add real-time status updates through IPC events
+
+5. **Testing Tasks**:
+   - Create contract tests for all IPC APIs
+   - Write unit tests for process identification and termination logic
+   - Create integration tests for end-to-end server management workflows
+   - Add performance tests for server start/stop operations
+
 **IMPORTANT**: This phase is executed by the /tasks command, NOT by /plan
 
 ## Phase 3+: Future Implementation
@@ -190,7 +221,7 @@ packages/
 - [x] Phase 0: Research complete (/plan command)
 - [x] Phase 1: Design complete (/plan command)
 - [x] Phase 2: Task planning complete (/plan command - describe approach only)
-- [ ] Phase 3: Tasks generated (/tasks command)
+- [x] Phase 3: Tasks generated (/tasks command)
 - [ ] Phase 4: Implementation complete
 - [ ] Phase 5: Validation passed
 
@@ -198,7 +229,7 @@ packages/
 - [x] Initial Constitution Check: PASS
 - [x] Post-Design Constitution Check: PASS
 - [x] All NEEDS CLARIFICATION resolved
-- [ ] Complexity deviations documented
+- [x] Complexity deviations documented
 
 ---
 *Based on Constitution v2.1.1 - See `/memory/constitution.md`*
