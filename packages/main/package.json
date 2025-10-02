@@ -11,6 +11,8 @@
   "scripts": {
     "dev": "node ../dev-mode.js",
     "build": "vite build",
+    "lint": "eslint --fix",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -19,8 +21,10 @@
     "@app/renderer": "workspace:*",
     "electron-store": "catalog:",
     "electron-updater": "catalog:",
+    "find-process": "catalog:",
     "http-proxy-middleware": "catalog:",
-    "live-server": "catalog:"
+    "live-server": "catalog:",
+    "tree-kill": "catalog:"
   },
   "devDependencies": {
     "@app/electron-versions": "workspace:*",

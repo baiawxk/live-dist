@@ -8,7 +8,6 @@
 - **Vue.js 3**: 作为前端框架（renderer 包中使用）
 - **Element Plus**: 用于 UI 组件
 - **TypeScript**: 用于类型安全
-- **Playwright**: 用于端到端测试
 - **Zod**: 用于 IPC 通信的数据验证
 - **Vitest**: 用于单元测试
 
@@ -101,7 +100,6 @@ pnpm init
 2. **安全性**: 遵循 Electron 安全指南，使用上下文隔离和预加载脚本。
 3. **TypeScript**: 全项目使用 TypeScript 进行类型检查。
 4. **Monorepo**: 使用 pnpm workspaces 管理多个包。
-5. **环境变量**: 使用 `import.meta.env` 访问环境变量，只有以 `VITE_` 为前缀的变量才会暴露给客户端代码。
 6. **API 设计**: 使用 Zod 进行严格的类型验证，确保 IPC 通信的安全性和可靠性。
 7. **IPC 通信**: 采用基于 Zod 的类型安全 IPC 通信机制，确保主进程和渲染进程之间的通信安全可靠。
 8. **测试**: 使用 Vitest 进行单元测试，为每个包提供独立的测试环境。
@@ -172,10 +170,68 @@ pnpm init
 ### 端到端测试
 使用 Playwright 进行端到端测试，测试文件位于项目根目录的 `tests` 目录中。
 
+## 项目配置和工具链
+
+### 构建工具
+- **Vite**: 用于开发服务器和构建工具
+- **Tsup**: 用于 API 包的构建
+- **Electron Builder**: 用于打包 Electron 应用
+- **Turbo**: 用于工作区的构建协调
+
+### 代码质量工具
+- **ESLint**: 代码规范检查，使用 @antfu/eslint-config
+- **TypeScript**: 类型检查
+- **Oxlint**: 高性能的 Linter 工具
+
+### 开发工具
+- **PNPM**: 包管理器
+- **Node.js**: 运行时环境 (要求 >=22.0.0)
+
+### CI/CD
+- **GitHub Actions**: 自动化构建、测试和部署
+- **Playwright**: 端到端测试
+
+## 安全特性
+
+1. **上下文隔离**: 使用 Electron 的上下文隔离特性
+2. **预加载脚本**: 通过预加载脚本安全地暴露 API
+3. **Zod 验证**: IPC 通信使用 Zod 进行严格的类型验证
+4. **外部 URL 控制**: 限制可访问的外部 URL
+5. **单实例应用**: 防止应用多开
+6. **硬件加速控制**: 可配置硬件加速选项
+
+## 性能优化
+
+1. **Vite 开发服务器**: 提供快速的热重载开发体验
+2. **模块化构建**: 使用 Turbo 协调多包构建
+3. **代码分割**: 通过 Vite 实现代码分割
+4. **资源压缩**: 构建时自动压缩资源
+
+## 开发者体验 (DX)
+
+1. **热重载**: 开发时支持主进程、预加载脚本和渲染器的热重载
+2. **类型安全**: 全项目使用 TypeScript，提供完整的类型检查
+3. **模块化设计**: 清晰的模块划分，便于维护和扩展
+4. **统一的错误处理**: 集中的错误处理机制
+5. **详细的日志记录**: 完善的日志记录便于调试
+
+## 新增功能和改进
+
+### 进程管理增强
+- 使用 `find-process` 和 `tree-kill` 库来更好地管理服务器进程
+- 改进了服务器启动和停止的逻辑，包括端口冲突检测和强制关闭机制
+- 增加了更完善的错误处理和超时机制
+
+### 代理配置
+- 支持为每个目录配置多个代理规则
+- 使用 `http-proxy-middleware` 实现代理功能
+- 支持自定义代理配置（changeOrigin, secure等选项）
+
 ## 代办事项
 
 - [ ] 丰富Vite插件,AutoImport...
 - [ ] 更新Readme.md
 - [ ] app/api > ipc
-- [ ] enhance zod & v4
 - [ ] refine ci
+- [x] use find-process to find-process use by this app or other process. if others ,remaind not to kill ,if is this app,can kill, use liveServer to startServer, use tree-kill to stopServer 
+- [ ] use sqlite3 to save app data
