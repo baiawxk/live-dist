@@ -37,8 +37,8 @@ catalogs:
       specifier: ^0.8.1
       version: 0.8.1
     create-vite:
-      specifier: 7.1.2
-      version: 7.1.2
+      specifier: 8.0.2
+      version: 8.0.2
     cross-env:
       specifier: ^10.0.0
       version: 10.0.0
@@ -149,7 +149,7 @@ importers:
         version: 3.2.4(vitest@4.0.0-beta.13)
       create-vite:
         specifier: 'catalog:'
-        version: 7.1.2
+        version: 8.0.2
       cross-env:
         specifier: 'catalog:'
         version: 10.0.0
@@ -1875,8 +1875,8 @@ packages:
   crc@3.8.0:
     resolution: {integrity: sha512-iX3mfgcTMIq3ZKLIsVFAbv7+Mc10kxabAGQb8HvjA1o3T1PIYprbakQ65d3I+2HGHt6nSKkM9PYjgoJO2KcFBQ==}
 
-  create-vite@7.1.2:
-    resolution: {integrity: sha512-Wrdbw7yMXTJQw+xoRHtKg0ycBa/4khf+bnIaVYcTljx2I1fzgXC9zIbpBstHSDOZYfPUOjdBoECNl7Xfx1ohew==}
+  create-vite@8.0.2:
+    resolution: {integrity: sha512-vWwuyDtHTOc0FKs6efl2FeDRp+zZ8MjvS1fKZachMQWgpOSc+ORTZtclgVqZj8J1ZFaeDbgKtxE/VhzlfBqZCw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
@@ -6571,7 +6571,7 @@ snapshots:
       buffer: 5.7.1
     optional: true
 
-  create-vite@7.1.2: {}
+  create-vite@8.0.2: {}
 
   cross-dirname@0.1.0:
     optional: true
